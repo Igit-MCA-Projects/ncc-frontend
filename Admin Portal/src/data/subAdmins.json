@@ -1,0 +1,5 @@
+[
+  { "id": "sa1", "name": "Ravi Menon", "email": "ravi@ncc.ai", "phone": "+91 9000011111", "role": "Moderator", "status": "active", "photo": "https://i.pravatar.cc/100?img=52" },
+  { "id": "sa2", "name": "Divya Sood", "email": "divya@ncc.ai", "phone": "+91 9000022222", "role": "Reviewer", "status": "active", "photo": "https://i.pravatar.cc/100?img=44" },
+  { "id": "sa3", "name": "Arjun Nair", "email": "arjun@ncc.ai", "phone": "+91 9000033333", "role": "Support", "status": "inactive", "photo": "https://i.pravatar.cc/100?img=53" }
+]

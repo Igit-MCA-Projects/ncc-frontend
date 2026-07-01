@@ -1,0 +1,8 @@
+{
+  "id": "admin1",
+  "name": "Admin User",
+  "email": "admin@ncc.ai",
+  "phone": "+91 9000000000",
+  "role": "Super Admin",
+  "photo": "https://i.pravatar.cc/150?img=68"
+}

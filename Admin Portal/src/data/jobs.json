@@ -1,0 +1,9 @@
+[
+  { "id": "j1", "companyId": "c1", "companyName": "TechNova Pvt Ltd", "title": "Frontend Developer", "location": "Bangalore", "salary": "8-12 LPA", "experience": "1-3 yrs", "postedDate": "2026-06-20", "status": "pending", "description": "Build modern React interfaces for enterprise clients." },
+  { "id": "j2", "companyId": "c1", "companyName": "TechNova Pvt Ltd", "title": "Backend Engineer", "location": "Remote", "salary": "12-18 LPA", "experience": "2-5 yrs", "postedDate": "2026-06-22", "status": "approved", "description": "Node.js microservices and PostgreSQL." },
+  { "id": "j3", "companyId": "c2", "companyName": "GreenLeaf Agro", "title": "Field Agronomist", "location": "Pune", "salary": "5-7 LPA", "experience": "0-2 yrs", "postedDate": "2026-06-18", "status": "pending", "description": "Advise farmers on sustainable practices." },
+  { "id": "j4", "companyId": "c4", "companyName": "MediCore Health", "title": "Data Analyst", "location": "Hyderabad", "salary": "7-10 LPA", "experience": "1-3 yrs", "postedDate": "2026-06-25", "status": "pending", "description": "Analyse hospital ops data." },
+  { "id": "j5", "companyId": "c6", "companyName": "EduSpark Learning", "title": "Content Designer", "location": "Bangalore", "salary": "6-9 LPA", "experience": "1-2 yrs", "postedDate": "2026-06-15", "status": "rejected", "description": "Design K-12 learning content." },
+  { "id": "j6", "companyId": "c5", "companyName": "BuildRight Infra", "title": "Site Engineer", "location": "Delhi", "salary": "5-8 LPA", "experience": "1-3 yrs", "postedDate": "2026-06-27", "status": "approved", "description": "Manage on-site construction operations." },
+  { "id": "j7", "companyId": "c1", "companyName": "TechNova Pvt Ltd", "title": "DevOps Engineer", "location": "Bangalore", "salary": "14-20 LPA", "experience": "3-6 yrs", "postedDate": "2026-06-28", "status": "pending", "description": "AWS, Kubernetes, CI/CD." }
+]

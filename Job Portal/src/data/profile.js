@@ -1,0 +1,25 @@
+const profile = {
+  id: "u1",
+  fullName: "Arjun Verma",
+  email: "arjun.verma@cadet.in",
+  phone: "+91 98765 43210",
+  avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Arjun",
+  college: "Delhi Technological University",
+  course: "B.Tech",
+  branch: "Computer Science",
+  passingYear: 2026,
+  cgpa: 8.4,
+  location: "New Delhi, IN",
+  skills: ["React", "JavaScript", "Tailwind", "Git", "SQL", "Leadership"],
+  preferredRole: "Frontend Developer",
+  linkedin: "https://linkedin.com/in/arjunverma",
+  github: "https://github.com/arjunverma",
+  resumeUrl: "#",
+  projects: [
+    { name: "Cadet Connect", desc: "Social platform connecting NCC cadets across India." },
+    { name: "DrillTracker", desc: "Mobile-first attendance + drill scoring app." },
+  ],
+  ncc: { wing: "Army", certificate: "C", rank: "Sergeant" },
+  completion: 82,
+};
+export default profile;

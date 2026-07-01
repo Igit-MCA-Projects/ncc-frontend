@@ -1,0 +1,6 @@
+[
+  { "id": "n1", "title": "New job pending approval", "time": "2h ago", "unread": true },
+  { "id": "n2", "title": "5 new students registered", "time": "5h ago", "unread": true },
+  { "id": "n3", "title": "Company FinEdge Capital was blocked", "time": "1d ago", "unread": false },
+  { "id": "n4", "title": "Sub-admin Divya updated profile", "time": "2d ago", "unread": false }
+]
