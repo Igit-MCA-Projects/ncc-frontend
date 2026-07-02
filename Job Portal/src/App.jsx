@@ -3,7 +3,7 @@ import Landing from "./pages/Landing";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Register from "./pages/Register"
 import Dashboard from "./pages/Dashboard";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";

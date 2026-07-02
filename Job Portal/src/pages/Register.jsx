@@ -1,145 +1,254 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Shield, Upload } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Shield, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 
-const WINGS = ["Army", "Navy", "Air"];
-const CERTS = ["A", "B", "C"];
-const RANKS = ["Cadet", "Corporal", "Sergeant", "Senior Under Officer"];
-
 export default function Register() {
-  const { register } = useAuth();
+  const { register, verifyEmail } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    fullName: "", email: "", phone: "", password: "",
-    college: "", course: "", branch: "", passingYear: "", cgpa: "",
-    location: "", skills: "", preferredRole: "",
-    linkedin: "", github: "", resume: null,
-    nccWing: "Army", nccCertificate: "B", nccRank: "Cadet",
-  });
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target?.files ? e.target.files[0] : e.target.value });
 
-  const submit = async (e) => {
+  const [form, setForm] = useState({ fullname: "", email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [otpStep, setOtpStep] = useState(false);
+  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  // ── Validation ──────────────────────────────────────────────────────────────
+  const validate = () => {
+    const errs = {};
+    if (!form.fullname.trim()) errs.fullname = "Full name is required.";
+    if (!form.email.trim()) errs.email = "Email is required.";
+    if (form.password.length < 8) errs.password = "Password must be at least 8 characters.";
+    return errs;
+  };
+
+  // ── Register submit ─────────────────────────────────────────────────────────
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    setErrors({});
     setLoading(true);
     try {
-      await register({ ...form, skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean) });
-      toast.success("Account created. Welcome aboard!");
-      navigate("/dashboard");
+        console.log("api call done")
+      const res = await register({ fullName: form.fullname, email: form.email, password: form.password });
+      console.log("api call res",res);
+      toast.success("Account created! Check your email for the OTP.");
+      setOtpStep(true);
     } catch (err) {
-      toast.error(err.message || "Registration failed");
-    } finally { setLoading(false); }
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ── OTP input handling ──────────────────────────────────────────────────────
+  const handleOtpChange = (index, value) => {
+    if (!/^\d?$/.test(value)) return;
+    const updated = [...otp];
+    updated[index] = value;
+    setOtp(updated);
+    if (value && index < 3) document.getElementById(`otp-${index + 1}`)?.focus();
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      document.getElementById(`otp-${index - 1}`)?.focus();
+    }
+  };
+
+  // ── Verify OTP ──────────────────────────────────────────────────────────────
+  const handleVerifyOtp = async () => {
+    const enteredOtp = otp.join("");
+    if (enteredOtp.length < 4) return;
+    setOtpLoading(true);
+    try {
+      await verifyEmail({ email: form.email, otp: enteredOtp });
+      toast.success("Email verified! Please sign in.");
+      navigate("/login");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setOtpLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-3xl px-4 py-10">
-        <Link to="/" className="flex items-center gap-2 mb-6">
-          <div className="h-9 w-9 rounded-xl hero-gradient grid place-items-center"><Shield className="h-5 w-5 text-white"/></div>
+    <div className="min-h-screen grid lg:grid-cols-2">
+      {/* ── Left branding panel ── */}
+      <div className="hidden lg:flex flex-col justify-between hero-gradient text-white p-10">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="h-9 w-9 rounded-xl bg-white/15 grid place-items-center">
+            <Shield className="h-5 w-5" />
+          </div>
           <span className="font-display font-extrabold">NCC Career AI</span>
         </Link>
+        <div>
+          <h2 className="text-4xl font-display font-extrabold leading-tight">
+            Join the ranks, cadet.
+          </h2>
+          <p className="mt-3 text-white/85 max-w-md">
+            Create your account and let AI guide your career mission.
+          </p>
+        </div>
+        <div className="text-xs text-white/70">© NCC Career AI</div>
+      </div>
 
+      {/* ── Right form panel ── */}
+      <div className="flex items-center justify-center p-6 sm:p-10">
         <motion.form
-          onSubmit={submit}
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          className="card-soft p-8"
+          onSubmit={handleSubmit}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-md card-soft p-8 relative"
         >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-2xl font-display font-extrabold">Create your cadet profile</h1>
-              <p className="text-sm text-muted-foreground mt-1">Step {step} of 3</p>
-            </div>
-            <div className="h-2 w-32 rounded-full bg-muted overflow-hidden">
-              <div className="h-full hero-gradient transition-all" style={{ width: `${(step / 3) * 100}%` }}/>
-            </div>
+          <h1 className="text-2xl font-display font-extrabold">Create account</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Fill in your details to get started.
+          </p>
+
+          <div className="mt-6 space-y-4">
+            {/* Full Name */}
+            <label className="block">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Full Name
+              </span>
+              <div className="mt-1 relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  required
+                  type="text"
+                  value={form.fullname}
+                  onChange={(e) => setForm({ ...form, fullname: e.target.value })}
+                  placeholder="John Doe"
+                  className="w-full h-11 pl-10 pr-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+              </div>
+              {errors.fullname && <p className="text-xs text-red-500 mt-1">{errors.fullname}</p>}
+            </label>
+
+            {/* Email */}
+            <label className="block">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Email
+              </span>
+              <div className="mt-1 relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  required
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="you@example.com"
+                  className="w-full h-11 pl-10 pr-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+              </div>
+              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+            </label>
+
+            {/* Password with eye toggle */}
+            <label className="block">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Password
+              </span>
+              <div className="mt-1 relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  required
+                  type={showPassword ? "text" : "password"}
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="Min. 8 characters"
+                  className="w-full h-11 pl-10 pr-10 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((p) => !p)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
+            </label>
           </div>
 
-          {step === 1 && (
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Input label="Full name" value={form.fullName} onChange={set("fullName")} required/>
-              <Input label="Email" type="email" value={form.email} onChange={set("email")} required/>
-              <Input label="Phone" value={form.phone} onChange={set("phone")} />
-              <Input label="Password" type="password" value={form.password} onChange={set("password")} required/>
-              <Input label="Location" value={form.location} onChange={set("location")} />
-              <Input label="Preferred role" value={form.preferredRole} onChange={set("preferredRole")} placeholder="e.g. Frontend Developer"/>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Input label="College" value={form.college} onChange={set("college")} />
-              <Input label="Course" value={form.course} onChange={set("course")} placeholder="B.Tech"/>
-              <Input label="Branch" value={form.branch} onChange={set("branch")} />
-              <Input label="Passing year" type="number" value={form.passingYear} onChange={set("passingYear")} />
-              <Input label="CGPA" value={form.cgpa} onChange={set("cgpa")} />
-              <Input label="Skills (comma separated)" value={form.skills} onChange={set("skills")} placeholder="React, JS, SQL"/>
-              <Input label="LinkedIn" value={form.linkedin} onChange={set("linkedin")} />
-              <Input label="GitHub" value={form.github} onChange={set("github")} />
-              <div className="sm:col-span-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Resume (PDF)</label>
-                <div className="mt-1 flex items-center gap-3">
-                  <label className="btn-outline text-sm cursor-pointer inline-flex items-center gap-2">
-                    <Upload className="h-4 w-4"/> {form.resume ? "Replace file" : "Upload resume"}
-                    <input type="file" className="hidden" onChange={set("resume")} accept="application/pdf"/>
-                  </label>
-                  {form.resume && <span className="text-sm text-muted-foreground">{form.resume.name}</span>}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="grid sm:grid-cols-3 gap-4">
-              <Select label="NCC Wing" value={form.nccWing} onChange={set("nccWing")} options={WINGS}/>
-              <Select label="Certificate" value={form.nccCertificate} onChange={set("nccCertificate")} options={CERTS}/>
-              <Select label="Rank" value={form.nccRank} onChange={set("nccRank")} options={RANKS}/>
-              <div className="sm:col-span-3 rounded-2xl bg-muted/60 p-4 text-sm text-muted-foreground">
-                <strong className="text-foreground">Almost there.</strong> Your NCC details improve match accuracy by up to 18%.
-              </div>
-            </div>
-          )}
-
-          <div className="mt-7 flex items-center justify-between gap-3">
-            <button type="button" onClick={() => setStep((s) => Math.max(1, s - 1))}
-              className="btn-outline text-sm" disabled={step === 1}>
-              Back
-            </button>
-            {step < 3 ? (
-              <button type="button" onClick={() => setStep((s) => s + 1)} className="btn-primary text-sm">Continue</button>
-            ) : (
-              <button disabled={loading} className="btn-primary text-sm">{loading ? "Creating…" : "Create account"}</button>
-            )}
-          </div>
+          <button type="submit" disabled={loading} className="btn-primary w-full mt-6">
+            {loading ? "Creating account…" : "Create Account"}
+          </button>
 
           <p className="text-sm text-center mt-6 text-muted-foreground">
-            Already have an account? <Link to="/login" className="text-primary font-semibold hover:underline">Sign in</Link>
+            Already have an account?{" "}
+            <Link to="/login" className="text-primary font-semibold hover:underline">
+              Sign in
+            </Link>
           </p>
+
+          {/* ── OTP Overlay ── */}
+          <AnimatePresence>
+            {otpStep && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.25 }}
+                className="absolute inset-0 rounded-2xl bg-card/95 backdrop-blur-sm flex flex-col items-center justify-center gap-6 p-8 z-10"
+              >
+                <div className="text-center">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 grid place-items-center mx-auto mb-3">
+                    <Mail className="h-5 w-5 text-primary" />
+                  </div>
+                  <h2 className="text-lg font-display font-extrabold">Verify your email</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Enter the 4-digit OTP sent to{" "}
+                    <span className="font-semibold text-foreground">{form.email}</span>
+                  </p>
+                </div>
+
+                {/* 4-box OTP input */}
+                <div className="flex gap-3">
+                  {otp.map((digit, i) => (
+                    <input
+                      key={i}
+                      id={`otp-${i}`}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(i, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                      className="w-12 h-12 text-center text-xl font-bold rounded-xl bg-card border-2 border-border focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all"
+                    />
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  disabled={otp.join("").length < 4 || otpLoading}
+                  className="btn-primary w-full max-w-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {otpLoading ? "Verifying…" : "Verify OTP"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOtpStep(false)}
+                  className="text-xs text-muted-foreground hover:underline"
+                >
+                  Go back
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.form>
       </div>
     </div>
-  );
-}
-
-function Input({ label, ...props }) {
-  return (
-    <label className="block">
-      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-      <input {...props} className="mt-1 w-full h-11 px-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"/>
-    </label>
-  );
-}
-function Select({ label, value, onChange, options }) {
-  return (
-    <label className="block">
-      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-      <select value={value} onChange={onChange}
-        className="mt-1 w-full h-11 px-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40">
-        {options.map((o) => <option key={o}>{o}</option>)}
-      </select>
-    </label>
   );
 }

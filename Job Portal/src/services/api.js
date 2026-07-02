@@ -1,26 +1,24 @@
-// Mock API service. Swap baseURL + uncomment axios calls when backend is ready.
+/**
+ * api.js
+ * General-purpose axios instance for non-auth API calls (jobs, profile, etc.)
+ * Auth calls are handled by services/authApi.js
+ */
 import axios from "axios";
+import { BASE_URL } from "../context/baseapi";
 import jobs from "../data/jobs";
 import profile from "../data/profile";
 import savedJobs from "../data/savedJobs";
 
 export const api = axios.create({
-  baseURL: "/api",
+  baseURL: "/api/v1",
   timeout: 10000,
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" },
 });
 
 const delay = (ms = 400) => new Promise((r) => setTimeout(r, ms));
 
-export async function login({ email, password }) {
-  await delay();
-  if (!email || !password) throw new Error("Email and password required");
-  return { token: "mock-jwt-token", user: { ...profile, email } };
-}
-
-export async function register(payload) {
-  await delay(600);
-  return { token: "mock-jwt-token", user: { ...profile, ...payload } };
-}
+// ─── Jobs (mock until backend is ready) ─────────────────────────────────────
 
 export async function getJobs() {
   await delay();
@@ -32,6 +30,8 @@ export async function getJob(id) {
   return jobs.find((j) => j.id === String(id));
 }
 
+// ─── Profile (mock until backend is ready) ───────────────────────────────────
+
 export async function getProfile() {
   await delay(200);
   return profile;
@@ -41,6 +41,8 @@ export async function updateProfile(patch) {
   await delay(300);
   return { ...profile, ...patch };
 }
+
+// ─── Saved Jobs ──────────────────────────────────────────────────────────────
 
 export async function getSavedJobs() {
   await delay(200);
