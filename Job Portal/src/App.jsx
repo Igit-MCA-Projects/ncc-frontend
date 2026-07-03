@@ -9,6 +9,7 @@ import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 import SavedJobs from "./pages/SavedJobs";
 import Profile from "./pages/Profile";
+import ProfileCompletionForm from "./pages/ProfileCompletionform";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ export default function App() {
       <Route path="/jobs/:id" element={<JobDetails />} />
       <Route path="/saved-jobs" element={<SavedJobs />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/profile-complete" element={<ProfileCompletionForm />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

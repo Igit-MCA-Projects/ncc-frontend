@@ -1,145 +1,604 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Shield, Upload } from "lucide-react";
+import {
+  useForm,
+  useFieldArray,
+  Controller,
+} from "react-hook-form";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Shield, Plus, Trash2, Loader2, ChevronRight, ChevronLeft,
+} from "lucide-react";
 import toast from "react-hot-toast";
-import { useAuth } from "../context/AuthContext";
+import { ProfileProvider, useProfile } from "../context/ProfileContext";
 
-const WINGS = ["Army", "Navy", "Air"];
-const CERTS = ["A", "B", "C"];
-const RANKS = ["Cadet", "Corporal", "Sergeant", "Senior Under Officer"];
+// ─── Constants (aligned with backend Zod schema) ──────────────────────────────
 
-export default function ProfilecomlitionForm() {
-  const { register } = useAuth();
+const GENDERS = ["MALE", "FEMALE", "OTHER"];
+const EDU_LEVELS = [
+  "HIGH_SCHOOL", "DIPLOMA", "BACHELORS", "MASTERS", "PHD", "CERTIFICATION", "OTHER",
+];
+const ADDR_TYPES = ["CURRENT", "PERMANENT", "HOSTEL", "OFFICE", "OTHER"];
+const SOCIAL_PLATFORMS = ["GitHub", "LinkedIn", "Portfolio", "Twitter", "LeetCode", "Other"];
+
+const STEPS = [
+  { label: "Personal Info",  fields: ["phone", "dateOfBirth", "gender", "headline", "bio", "profileImage", "resumeUrl"] },
+  { label: "Preferences",    fields: ["preferredRole", "expectedSalary", "preferredLocation", "willingToRelocate", "openToRemote"] },
+  { label: "Addresses",      fields: ["addresses"] },
+  { label: "Education",      fields: ["educations"] },
+  { label: "Social Links",   fields: ["socialLinks"] },
+];
+
+// ─── Default values ───────────────────────────────────────────────────────────
+
+const defaultValues = {
+  phone: "",
+  dateOfBirth: "",
+  gender: "MALE",
+  headline: "",
+  bio: "",
+  profileImage: "",
+  resumeUrl: "",
+  preferredRole: "",
+  preferredLocation: [],
+  expectedSalary: "",
+  willingToRelocate: false,
+  openToRemote: false,
+  addresses: [
+    { type: "CURRENT",    city: "", district: "", state: "", country: "India", pinCode: "", landMark: "", building: "", street: "" },
+    { type: "PERMANENT",  city: "", district: "", state: "", country: "India", pinCode: "", landMark: "", building: "", street: "" },
+  ],
+  educations: [
+    { level: "BACHELORS", institutionName: "", boardOrUniversity: "", degree: "", fieldOfStudy: "", startDate: "", endDate: "", cgpa: "", percentage: "" },
+  ],
+  socialLinks: [
+    { platform: "GitHub",   url: "" },
+    { platform: "LinkedIn", url: "" },
+  ],
+};
+
+// ─── Inner form component ─────────────────────────────────────────────────────
+
+function ProfileCompletionFormInner() {
+  const { submitProfile } = useProfile();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    fullName: "", email: "", phone: "", password: "",
-    college: "", course: "", branch: "", passingYear: "", cgpa: "",
-    location: "", skills: "", preferredRole: "",
-    linkedin: "", github: "", resume: null,
-    nccWing: "Army", nccCertificate: "B", nccRank: "Cadet",
-  });
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target?.files ? e.target.files[0] : e.target.value });
+  const [submitting, setSubmitting] = useState(false); // local — NOT from context
+  const [locationInput, setLocationInput] = useState("");
 
-  const submit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const {
+    register,
+    control,
+    handleSubmit,
+    trigger,
+    watch,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useForm({ defaultValues, mode: "onTouched" });
+
+  // Field arrays
+  const addressArray  = useFieldArray({ control, name: "addresses" });
+  const educationArray = useFieldArray({ control, name: "educations" });
+  const socialArray   = useFieldArray({ control, name: "socialLinks" });
+
+  const preferredLocation = watch("preferredLocation");
+
+  // ── Location chip helpers ──────────────────────────────────────────────────
+  const addLocation = () => {
+    const loc = locationInput.trim();
+    if (loc && !preferredLocation.includes(loc)) {
+      setValue("preferredLocation", [...preferredLocation, loc]);
+    }
+    setLocationInput("");
+  };
+  const removeLocation = (loc) =>
+    setValue("preferredLocation", preferredLocation.filter((l) => l !== loc));
+
+  // ── Step navigation ────────────────────────────────────────────────────────
+  const goNext = async () => {
+    const valid = await trigger(STEPS[step - 1].fields);
+    if (valid) setStep((s) => Math.min(STEPS.length, s + 1));
+  };
+  const goBack = () => setStep((s) => Math.max(1, s - 1));
+
+  // ── Submit ─────────────────────────────────────────────────────────────────
+  const onSubmit = async (formData) => {
+    // Build clean payload matching backend schema exactly
+    const payload = {
+      phone: formData.phone || undefined,
+      dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : undefined,
+      gender: formData.gender || undefined,
+      headline: formData.headline || undefined,
+      bio: formData.bio || undefined,
+      profileImage: formData.profileImage || undefined,
+      resumeUrl: formData.resumeUrl || undefined,
+      preferredRole: formData.preferredRole || undefined,
+      preferredLocation: formData.preferredLocation?.length ? formData.preferredLocation : undefined,
+      expectedSalary: formData.expectedSalary ? parseInt(formData.expectedSalary, 10) : undefined,
+      willingToRelocate: formData.willingToRelocate,
+      openToRemote: formData.openToRemote,
+      addresses: formData.addresses
+        .filter((a) => a.city.trim())
+        .map(({ cgpa, percentage, ...a }) => a), // strip edu-only fields if any
+      educations: formData.educations
+        .filter((e) => e.institutionName.trim())
+        .map((e) => ({
+          level: e.level,
+          institutionName: e.institutionName,
+          boardOrUniversity: e.boardOrUniversity || undefined,
+          degree: e.degree || undefined,
+          fieldOfStudy: e.fieldOfStudy || undefined,
+          startDate: e.startDate ? new Date(e.startDate).toISOString() : new Date().toISOString(),
+          endDate: e.endDate ? new Date(e.endDate).toISOString() : undefined,
+          cgpa: e.cgpa ? parseFloat(e.cgpa) : undefined,
+          percentage: e.percentage ? parseFloat(e.percentage) : undefined,
+        })),
+      socialLinks: formData.socialLinks
+        .filter((s) => s.url.trim())
+        .map((s) => ({ platform: s.platform, url: s.url })),
+    };
+
+    console.log("📤 Submitting profile payload:", JSON.stringify(payload, null, 2));
+
+    setSubmitting(true);
     try {
-      await register({ ...form, skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean) });
-      toast.success("Account created. Welcome aboard!");
-      navigate("/dashboard");
+      await submitProfile(payload);
+      toast.success("Profile completed successfully!");
+      navigate("/profile");
     } catch (err) {
-      toast.error(err.message || "Registration failed");
-    } finally { setLoading(false); }
+      console.error("❌ Profile submission error:", err);
+      toast.error(err.message || "Failed to save profile. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // ── Error helper ───────────────────────────────────────────────────────────
+  const Err = ({ name }) => {
+    const msg = name.split(".").reduce((o, k) => o?.[k], errors)?.message;
+    return msg ? <p className="mt-1 text-xs text-destructive">{msg}</p> : null;
   };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 py-10">
+        {/* Logo */}
         <Link to="/" className="flex items-center gap-2 mb-6">
-          <div className="h-9 w-9 rounded-xl hero-gradient grid place-items-center"><Shield className="h-5 w-5 text-white"/></div>
+          <div className="h-9 w-9 rounded-xl hero-gradient grid place-items-center">
+            <Shield className="h-5 w-5 text-white" />
+          </div>
           <span className="font-display font-extrabold">NCC Career AI</span>
         </Link>
 
-        <motion.form
-          onSubmit={submit}
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
           className="card-soft p-8"
         >
-          <div className="flex items-center justify-between mb-6">
+          {/* Header + progress */}
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
             <div>
-              <h1 className="text-2xl font-display font-extrabold">Create your cadet profile</h1>
-              <p className="text-sm text-muted-foreground mt-1">Step {step} of 3</p>
+              <h1 className="text-2xl font-display font-extrabold">Complete your profile</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Step {step} of {STEPS.length} — {STEPS[step - 1].label}
+              </p>
             </div>
-            <div className="h-2 w-32 rounded-full bg-muted overflow-hidden">
-              <div className="h-full hero-gradient transition-all" style={{ width: `${(step / 3) * 100}%` }}/>
+            <div className="flex items-center gap-1.5">
+              {STEPS.map((_, i) => (
+                <div key={i} className="h-2 rounded-full transition-all"
+                  style={{
+                    width: i + 1 === step ? "32px" : "10px",
+                    background: i + 1 <= step ? "var(--primary)" : "var(--muted)",
+                  }}
+                />
+              ))}
             </div>
           </div>
 
-          {step === 1 && (
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Input label="Full name" value={form.fullName} onChange={set("fullName")} required/>
-              <Input label="Email" type="email" value={form.email} onChange={set("email")} required/>
-              <Input label="Phone" value={form.phone} onChange={set("phone")} />
-              <Input label="Password" type="password" value={form.password} onChange={set("password")} required/>
-              <Input label="Location" value={form.location} onChange={set("location")} />
-              <Input label="Preferred role" value={form.preferredRole} onChange={set("preferredRole")} placeholder="e.g. Frontend Developer"/>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Input label="College" value={form.college} onChange={set("college")} />
-              <Input label="Course" value={form.course} onChange={set("course")} placeholder="B.Tech"/>
-              <Input label="Branch" value={form.branch} onChange={set("branch")} />
-              <Input label="Passing year" type="number" value={form.passingYear} onChange={set("passingYear")} />
-              <Input label="CGPA" value={form.cgpa} onChange={set("cgpa")} />
-              <Input label="Skills (comma separated)" value={form.skills} onChange={set("skills")} placeholder="React, JS, SQL"/>
-              <Input label="LinkedIn" value={form.linkedin} onChange={set("linkedin")} />
-              <Input label="GitHub" value={form.github} onChange={set("github")} />
-              <div className="sm:col-span-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Resume (PDF)</label>
-                <div className="mt-1 flex items-center gap-3">
-                  <label className="btn-outline text-sm cursor-pointer inline-flex items-center gap-2">
-                    <Upload className="h-4 w-4"/> {form.resume ? "Replace file" : "Upload resume"}
-                    <input type="file" className="hidden" onChange={set("resume")} accept="application/pdf"/>
-                  </label>
-                  {form.resume && <span className="text-sm text-muted-foreground">{form.resume.name}</span>}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="grid sm:grid-cols-3 gap-4">
-              <Select label="NCC Wing" value={form.nccWing} onChange={set("nccWing")} options={WINGS}/>
-              <Select label="Certificate" value={form.nccCertificate} onChange={set("nccCertificate")} options={CERTS}/>
-              <Select label="Rank" value={form.nccRank} onChange={set("nccRank")} options={RANKS}/>
-              <div className="sm:col-span-3 rounded-2xl bg-muted/60 p-4 text-sm text-muted-foreground">
-                <strong className="text-foreground">Almost there.</strong> Your NCC details improve match accuracy by up to 18%.
-              </div>
-            </div>
-          )}
-
-          <div className="mt-7 flex items-center justify-between gap-3">
-            <button type="button" onClick={() => setStep((s) => Math.max(1, s - 1))}
-              className="btn-outline text-sm" disabled={step === 1}>
-              Back
-            </button>
-            {step < 3 ? (
-              <button type="button" onClick={() => setStep((s) => s + 1)} className="btn-primary text-sm">Continue</button>
-            ) : (
-              <button disabled={loading} className="btn-primary text-sm">{loading ? "Creating…" : "Create account"}</button>
-            )}
+          {/* Step tabs */}
+          <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
+            {STEPS.map((s, i) => (
+              <button key={i} type="button" onClick={() => setStep(i + 1)}
+                className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${
+                  i + 1 === step
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : i + 1 < step
+                    ? "bg-primary/15 text-primary font-medium"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {i + 1}. {s.label}
+              </button>
+            ))}
           </div>
 
-          <p className="text-sm text-center mt-6 text-muted-foreground">
-            Already have an account? <Link to="/login" className="text-primary font-semibold hover:underline">Sign in</Link>
-          </p>
-        </motion.form>
+          {/* ── Form ── */}
+          <form onSubmit={handleSubmit(onSubmit)} noValidate
+            onKeyDown={(e) => {
+              // Prevent Enter from auto-submitting the multi-step form.
+              // Only allow it in textareas (where Enter = new line).
+              if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+                e.preventDefault();
+              }
+            }}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div key={step}
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}
+              >
+
+                {/* ── STEP 1: Personal Info ── */}
+                {step === 1 && (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <F label="Phone">
+                        <input {...register("phone")} placeholder="9876543210"
+                          className={inputCls(errors.phone)} />
+                      </F>
+                      <Err name="phone" />
+                    </div>
+
+                    <div>
+                      <F label="Gender">
+                        <select {...register("gender")} className={inputCls()}>
+                          {GENDERS.map((g) => <option key={g} value={g}>{g}</option>)}
+                        </select>
+                      </F>
+                    </div>
+
+                    <div>
+                      <F label="Date of Birth">
+                        <input type="date" {...register("dateOfBirth")} className={inputCls(errors.dateOfBirth)} />
+                      </F>
+                      <Err name="dateOfBirth" />
+                    </div>
+
+                    <div>
+                      <F label="Profile Image URL">
+                        <input {...register("profileImage", {
+                          validate: (v) => !v || /^https?:\/\/.+/.test(v) || "Must be a valid URL",
+                        })} placeholder="https://..." className={inputCls(errors.profileImage)} />
+                      </F>
+                      <Err name="profileImage" />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <F label="Professional Headline">
+                        <input {...register("headline")}
+                          placeholder="Full Stack Developer | React | Node.js"
+                          className={inputCls(errors.headline)} />
+                      </F>
+                      <Err name="headline" />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <F label="Bio">
+                        <textarea rows={3} {...register("bio")}
+                          placeholder="Tell recruiters about yourself…"
+                          className={`${inputCls()} h-auto px-3 py-2 resize-none`} />
+                      </F>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <F label="Resume URL">
+                        <input {...register("resumeUrl", {
+                          validate: (v) => !v || /^https?:\/\/.+/.test(v) || "Must be a valid URL",
+                        })} placeholder="https://drive.google.com/..." className={inputCls(errors.resumeUrl)} />
+                      </F>
+                      <Err name="resumeUrl" />
+                    </div>
+                  </div>
+                )}
+
+                {/* ── STEP 2: Preferences ── */}
+                {step === 2 && (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <F label="Preferred Role">
+                        <input {...register("preferredRole")} placeholder="Backend Developer" className={inputCls()} />
+                      </F>
+                    </div>
+
+                    <div>
+                      <F label="Expected Salary (₹)">
+                        <input type="number" {...register("expectedSalary", {
+                          min: { value: 1, message: "Must be positive" },
+                        })} placeholder="1200000" className={inputCls(errors.expectedSalary)} />
+                      </F>
+                      <Err name="expectedSalary" />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <F label="Preferred Locations">
+                        <div className="flex gap-2">
+                          <input value={locationInput}
+                            onChange={(e) => setLocationInput(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addLocation())}
+                            placeholder="e.g. Bengaluru"
+                            className="flex-1 h-11 px-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 text-sm" />
+                          <button type="button" onClick={addLocation} className="btn-primary text-sm px-4">Add</button>
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {preferredLocation.map((loc) => (
+                            <span key={loc} className="chip inline-flex items-center gap-1">
+                              {loc}
+                              <button type="button" onClick={() => removeLocation(loc)} className="hover:text-destructive">
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </F>
+                    </div>
+
+                    <Controller name="willingToRelocate" control={control}
+                      render={({ field }) => (
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input type="checkbox" checked={field.value} onChange={field.onChange}
+                            className="h-4 w-4 rounded border-border accent-primary" />
+                          <span className="text-sm font-medium">Willing to Relocate</span>
+                        </label>
+                      )} />
+
+                    <Controller name="openToRemote" control={control}
+                      render={({ field }) => (
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input type="checkbox" checked={field.value} onChange={field.onChange}
+                            className="h-4 w-4 rounded border-border accent-primary" />
+                          <span className="text-sm font-medium">Open to Remote</span>
+                        </label>
+                      )} />
+                  </div>
+                )}
+
+                {/* ── STEP 3: Addresses ── */}
+                {step === 3 && (
+                  <div className="space-y-6">
+                    {addressArray.fields.map((field, idx) => (
+                      <div key={field.id}>
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-sm font-semibold text-muted-foreground">
+                            Address #{idx + 1}
+                          </h3>
+                          {addressArray.fields.length > 1 && (
+                            <button type="button" onClick={() => addressArray.remove(idx)}
+                              className="text-destructive hover:text-destructive/80">
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div className="sm:col-span-2">
+                            <F label="Address Type *">
+                              <select {...register(`addresses.${idx}.type`, { required: "Required" })}
+                                className={inputCls(errors.addresses?.[idx]?.type)}>
+                                {ADDR_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                              </select>
+                            </F>
+                            <Err name={`addresses.${idx}.type`} />
+                          </div>
+                          {[
+                            { name: "building", label: "Building / Flat No.", required: false },
+                            { name: "street",   label: "Street",             required: false },
+                            { name: "landMark", label: "Landmark",           required: false },
+                            { name: "city",     label: "City *",             required: true },
+                            { name: "district", label: "District *",         required: true },
+                            { name: "state",    label: "State *",            required: true },
+                            { name: "country",  label: "Country *",          required: true },
+                            { name: "pinCode",  label: "Pin Code *",         required: true },
+                          ].map(({ name, label, required }) => (
+                            <div key={name}>
+                              <F label={label}>
+                                <input {...register(`addresses.${idx}.${name}`, {
+                                  required: required ? "Required" : false,
+                                })} className={inputCls(errors.addresses?.[idx]?.[name])} />
+                              </F>
+                              <Err name={`addresses.${idx}.${name}`} />
+                            </div>
+                          ))}
+                        </div>
+                        {idx < addressArray.fields.length - 1 && <hr className="border-border/60 mt-6" />}
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => addressArray.append({
+                      type: "CURRENT", city: "", district: "", state: "", country: "India",
+                      pinCode: "", landMark: "", building: "", street: "",
+                    })} className="btn-outline text-sm inline-flex items-center gap-2 w-full justify-center">
+                      <Plus className="h-4 w-4" /> Add Address
+                    </button>
+                  </div>
+                )}
+
+                {/* ── STEP 4: Education ── */}
+                {step === 4 && (
+                  <div className="space-y-6">
+                    {educationArray.fields.map((field, idx) => (
+                      <div key={field.id} className="rounded-xl bg-muted/40 p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <p className="text-sm font-semibold text-muted-foreground">Education #{idx + 1}</p>
+                          {educationArray.fields.length > 1 && (
+                            <button type="button" onClick={() => educationArray.remove(idx)}
+                              className="text-destructive hover:text-destructive/80">
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <F label="Level *">
+                              <select {...register(`educations.${idx}.level`, { required: "Required" })}
+                                className={inputCls(errors.educations?.[idx]?.level)}>
+                                {EDU_LEVELS.map((l) => <option key={l} value={l}>{l.replace(/_/g, " ")}</option>)}
+                              </select>
+                            </F>
+                            <Err name={`educations.${idx}.level`} />
+                          </div>
+                          <div>
+                            <F label="Institution Name *">
+                              <input {...register(`educations.${idx}.institutionName`, { required: "Institution name is required" })}
+                                className={inputCls(errors.educations?.[idx]?.institutionName)} />
+                            </F>
+                            <Err name={`educations.${idx}.institutionName`} />
+                          </div>
+                          <div>
+                            <F label="Board / University">
+                              <input {...register(`educations.${idx}.boardOrUniversity`)} className={inputCls()} />
+                            </F>
+                          </div>
+                          <div>
+                            <F label="Degree">
+                              <input {...register(`educations.${idx}.degree`)} placeholder="B.Tech" className={inputCls()} />
+                            </F>
+                          </div>
+                          <div>
+                            <F label="Field of Study">
+                              <input {...register(`educations.${idx}.fieldOfStudy`)} placeholder="Computer Science" className={inputCls()} />
+                            </F>
+                          </div>
+                          <div />
+                          <div>
+                            <F label="Start Date *">
+                              <input type="date" {...register(`educations.${idx}.startDate`, { required: "Required" })}
+                                className={inputCls(errors.educations?.[idx]?.startDate)} />
+                            </F>
+                            <Err name={`educations.${idx}.startDate`} />
+                          </div>
+                          <div>
+                            <F label="End Date">
+                              <input type="date" {...register(`educations.${idx}.endDate`)} className={inputCls()} />
+                            </F>
+                          </div>
+                          <div>
+                            <F label="CGPA">
+                              <input type="number" step="0.01" {...register(`educations.${idx}.cgpa`, {
+                                min: { value: 0, message: "Must be ≥ 0" },
+                                max: { value: 10, message: "Must be ≤ 10" },
+                              })} placeholder="8.72" className={inputCls(errors.educations?.[idx]?.cgpa)} />
+                            </F>
+                            <Err name={`educations.${idx}.cgpa`} />
+                          </div>
+                          <div>
+                            <F label="Percentage (%)">
+                              <input type="number" step="0.01" {...register(`educations.${idx}.percentage`, {
+                                min: { value: 0, message: "Must be ≥ 0" },
+                                max: { value: 100, message: "Must be ≤ 100" },
+                              })} placeholder="89.6" className={inputCls(errors.educations?.[idx]?.percentage)} />
+                            </F>
+                            <Err name={`educations.${idx}.percentage`} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => educationArray.append({
+                      level: "BACHELORS", institutionName: "", boardOrUniversity: "",
+                      degree: "", fieldOfStudy: "", startDate: "", endDate: "", cgpa: "", percentage: "",
+                    })} className="btn-outline text-sm inline-flex items-center gap-2 w-full justify-center">
+                      <Plus className="h-4 w-4" /> Add Education
+                    </button>
+                  </div>
+                )}
+
+                {/* ── STEP 5: Social Links ── */}
+                {step === 5 && (
+                  <div className="space-y-4">
+                    {socialArray.fields.map((field, idx) => (
+                      <div key={field.id} className="flex items-end gap-3">
+                        <div className="w-36 shrink-0">
+                          <F label="Platform">
+                            <select {...register(`socialLinks.${idx}.platform`)} className={inputCls()}>
+                              {SOCIAL_PLATFORMS.map((p) => <option key={p}>{p}</option>)}
+                            </select>
+                          </F>
+                        </div>
+                        <div className="flex-1">
+                          <F label="URL *">
+                            <input {...register(`socialLinks.${idx}.url`, {
+                              validate: (v) => !v || /^https?:\/\/.+/.test(v) || "Must be a valid URL",
+                            })} placeholder="https://github.com/username"
+                              className={inputCls(errors.socialLinks?.[idx]?.url)} />
+                          </F>
+                          <Err name={`socialLinks.${idx}.url`} />
+                        </div>
+                        {socialArray.fields.length > 1 && (
+                          <button type="button" onClick={() => socialArray.remove(idx)}
+                            className="text-destructive hover:text-destructive/80 mb-2">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => socialArray.append({ platform: "GitHub", url: "" })}
+                      className="btn-outline text-sm inline-flex items-center gap-2 w-full justify-center">
+                      <Plus className="h-4 w-4" /> Add Social Link
+                    </button>
+
+                    <div className="mt-4 rounded-2xl bg-primary/10 p-4 text-sm text-muted-foreground">
+                      <strong className="text-foreground">Almost there.</strong>{" "}
+                      Hit <em>Save Profile</em> below to complete your profile and start matching with NCC-friendly jobs.
+                    </div>
+                  </div>
+                )}
+
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Navigation buttons */}
+            <div className="mt-8 flex items-center justify-between gap-3">
+              <button type="button" onClick={goBack} disabled={step === 1}
+                className="btn-outline text-sm inline-flex items-center gap-1.5 disabled:opacity-40">
+                <ChevronLeft className="h-4 w-4" /> Back
+              </button>
+
+              {step < STEPS.length ? (
+                <button type="button" onClick={goNext}
+                  className="btn-primary text-sm inline-flex items-center gap-1.5">
+                  Continue <ChevronRight className="h-4 w-4" />
+                </button>
+              ) : (
+                /* Final step — explicit submit button */
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn-primary text-sm inline-flex items-center gap-2 min-w-[150px] justify-center"
+                >
+                  {submitting
+                    ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>
+                    : "Save Profile"}
+                </button>
+              )}
+            </div>
+          </form>
+        </motion.div>
       </div>
     </div>
   );
 }
 
-function Input({ label, ...props }) {
+// ─── Page export ──────────────────────────────────────────────────────────────
+
+export default function ProfileCompletionForm() {
   return (
-    <label className="block">
-      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-      <input {...props} className="mt-1 w-full h-11 px-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"/>
-    </label>
+    <ProfileProvider>
+      <ProfileCompletionFormInner />
+    </ProfileProvider>
   );
 }
-function Select({ label, value, onChange, options }) {
+
+// ─── Style helpers ────────────────────────────────────────────────────────────
+
+function inputCls(err) {
+  return `mt-1 w-full h-11 px-3 rounded-xl bg-card border text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+    err ? "border-destructive" : "border-border"
+  }`;
+}
+
+function F({ label, children }) {
   return (
     <label className="block">
       <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-      <select value={value} onChange={onChange}
-        className="mt-1 w-full h-11 px-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40">
-        {options.map((o) => <option key={o}>{o}</option>)}
-      </select>
+      {children}
     </label>
   );
 }

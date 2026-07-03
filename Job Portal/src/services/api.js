@@ -4,9 +4,7 @@
  * Auth calls are handled by services/authApi.js
  */
 import axios from "axios";
-import { BASE_URL } from "../context/baseapi";
 import jobs from "../data/jobs";
-import profile from "../data/profile";
 import savedJobs from "../data/savedJobs";
 
 export const api = axios.create({
@@ -30,16 +28,21 @@ export async function getJob(id) {
   return jobs.find((j) => j.id === String(id));
 }
 
-// ─── Profile (mock until backend is ready) ───────────────────────────────────
+// ─── Profile (real backend) ──────────────────────────────────────────────────
 
-export async function getProfile() {
-  await delay(200);
-  return profile;
+/** GET /student/profile — returns the full profile envelope */
+export async function getStudentProfile() {
+  const res = await api.get("/student/profile");
+  console.log("studentProfileres");
+  if (!res.data?.success) throw new Error(res.data?.message || "Failed to load profile");
+  return res.data.data; // the profile object (or null when not complete)
 }
 
-export async function updateProfile(patch) {
-  await delay(300);
-  return { ...profile, ...patch };
+/** POST /student/profile — submit / complete the profile */
+export async function completeStudentProfile(payload) {
+  const res = await api.post("/student/profile", payload);
+  if (!res.data?.success) throw new Error(res.data?.message || "Failed to save profile");
+  return res.data;
 }
 
 // ─── Saved Jobs ──────────────────────────────────────────────────────────────

@@ -85,3 +85,19 @@ export async function logoutStudent() {
     throw new Error(extractError(err));
   }
 }
+
+// ─── Get current user (session restore) ─────────────────────────────────────
+
+/**
+ * GET /auth/me
+ * Used on app boot to rehydrate the user from the httpOnly cookie.
+ * Throws if the session is expired or the user is not logged in.
+ */
+export async function getMe() {
+  try {
+    const res = await authAxios.get("/me");
+    return assertSuccess(res);
+  } catch (err) {
+    throw new Error(extractError(err));
+  }
+}
