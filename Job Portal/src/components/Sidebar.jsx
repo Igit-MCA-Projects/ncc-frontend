@@ -1,17 +1,22 @@
 import { Link, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Briefcase, Bookmark, User, Settings, LogOut, Shield, X,
+  LayoutDashboard, Briefcase, Bookmark, User, Settings, LogOut, Shield, X, Bot, ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+
 
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/jobs", label: "Jobs", icon: Briefcase },
   { to: "/saved-jobs", label: "Saved Jobs", icon: Bookmark },
   { to: "/profile", label: "Profile", icon: User },
+  { to: "/ncc-profile", label: "NCC Profile", icon: ShieldCheck },
+  { to: "/career-assistant", label: "Career Assistant", icon: Bot },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
+
+
 
 export default function Sidebar({ open, onClose }) {
   const { logout } = useAuth();
@@ -31,7 +36,7 @@ export default function Sidebar({ open, onClose }) {
       <aside
         className={[
           "fixed lg:sticky top-0 z-40 lg:z-auto h-screen w-64 shrink-0 bg-card border-r border-border",
-          "transition-transform duration-200",
+          "transition-transform duration-200 flex flex-col overflow-y-auto",
           open ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         ].join(" ")}
       >
@@ -62,7 +67,11 @@ export default function Sidebar({ open, onClose }) {
           ))}
         </nav>
 
-        <div className="absolute bottom-4 left-3 right-3">
+        {/* NCC Cadet Profile Card */}
+        <div className="flex-1" />
+      
+
+        <div className="p-3 border-t border-border shrink-0">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-foreground/80 hover:bg-muted"

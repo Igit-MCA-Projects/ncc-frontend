@@ -11,6 +11,8 @@ import SavedJobs from "./pages/SavedJobs";
 import Profile from "./pages/Profile";
 import ProfileCompletionForm from "./pages/ProfileCompletionform";
 import Settings from "./pages/Settings";
+import CareerAssistant from "./pages/CareerAssistant";
+import NccCadetProfile from "./pages/NccCadetProfile";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -28,6 +30,8 @@ export default function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/profile-complete" element={<ProfileCompletionForm />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/career-assistant" element={<CareerAssistant />} />
+      <Route path="/ncc-profile" element={<NccCadetProfile />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
