@@ -8,9 +8,11 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield, Plus, Trash2, Loader2, ChevronRight, ChevronLeft,
+  Upload, CheckCircle2, FileText,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { ProfileProvider, useProfile } from "../context/ProfileContext";
+import { api } from "../services/api";
 
 // ─── Constants (aligned with backend Zod schema) ──────────────────────────────
 
@@ -65,6 +67,37 @@ function ProfileCompletionFormInner() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false); // local — NOT from context
   const [locationInput, setLocationInput] = useState("");
+
+  // ── File upload state ──────────────────────────────────────────────────────
+  const [imageFile, setImageFile]       = useState(null);   // selected File object
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageUploaded, setImageUploaded]   = useState(false); // true after successful upload
+
+  const [resumeFile, setResumeFile]       = useState(null);
+  const [resumeUploading, setResumeUploading] = useState(false);
+  const [resumeUploaded, setResumeUploaded]   = useState(false);
+
+  const uploadFile = async (file, onUrl, setUploading, setUploaded) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    setUploading(true);
+    try {
+      const res = await api.post("/upload-file", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (!res.data?.success) throw new Error(res.data?.message || "Upload failed");
+      const url = res.data.data; // backend returns the URL string directly in data
+      onUrl(url);
+      setUploaded(true);
+      toast.success("File uploaded successfully!");
+    } catch (err) {
+      console.error("Upload error:", err);
+      toast.error(err.response?.data?.message || err.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const {
     register,
@@ -255,12 +288,53 @@ function ProfileCompletionFormInner() {
                       <Err name="dateOfBirth" />
                     </div>
 
+                    {/* Profile Image Upload */}
                     <div>
-                      <F label="Profile Image URL">
-                        <input {...register("profileImage", {
-                          validate: (v) => !v || /^https?:\/\/.+/.test(v) || "Must be a valid URL",
-                        })} placeholder="https://..." className={inputCls(errors.profileImage)} />
-                      </F>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                        Profile Image
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <label className="flex-1 cursor-pointer">
+                          <div className={`mt-1 h-11 px-3 rounded-xl bg-card border text-sm flex items-center gap-2 overflow-hidden ${
+                            imageUploaded ? "border-green-500/60" : "border-border"
+                          }`}>
+                            {imageUploaded
+                              ? <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                              : <Upload className="h-4 w-4 text-muted-foreground shrink-0" />}
+                            <span className="truncate text-muted-foreground">
+                              {imageFile ? imageFile.name : "Choose image file…"}
+                            </span>
+                          </div>
+                          <input type="file" accept="image/*" className="hidden"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0] || null;
+                              setImageFile(f);
+                              setImageUploaded(false);   // allow re-upload
+                              setValue("profileImage", ""); // clear old URL
+                            }}
+                          />
+                        </label>
+                        <button type="button"
+                          disabled={!imageFile || imageUploading || imageUploaded}
+                          onClick={() => uploadFile(
+                            imageFile,
+                            (url) => setValue("profileImage", url),
+                            setImageUploading, setImageUploaded
+                          )}
+                          className="btn-primary text-sm px-3 h-11 shrink-0 disabled:opacity-40 flex items-center gap-1.5"
+                        >
+                          {imageUploading
+                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                            : imageUploaded
+                            ? <CheckCircle2 className="h-4 w-4" />
+                            : <Upload className="h-4 w-4" />}
+                          {imageUploading ? "Uploading…" : imageUploaded ? "Uploaded" : "Upload"}
+                        </button>
+                      </div>
+                      {/* Hidden registered field to hold the URL */}
+                      <input type="hidden" {...register("profileImage", {
+                        validate: (v) => !v || /^https?:\/\/.+/.test(v) || "Must be a valid URL",
+                      })} />
                       <Err name="profileImage" />
                     </div>
 
@@ -281,12 +355,52 @@ function ProfileCompletionFormInner() {
                       </F>
                     </div>
 
+                    {/* Resume Upload */}
                     <div className="sm:col-span-2">
-                      <F label="Resume URL">
-                        <input {...register("resumeUrl", {
-                          validate: (v) => !v || /^https?:\/\/.+/.test(v) || "Must be a valid URL",
-                        })} placeholder="https://drive.google.com/..." className={inputCls(errors.resumeUrl)} />
-                      </F>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                        Resume / CV
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <label className="flex-1 cursor-pointer">
+                          <div className={`mt-1 h-11 px-3 rounded-xl bg-card border text-sm flex items-center gap-2 overflow-hidden ${
+                            resumeUploaded ? "border-green-500/60" : "border-border"
+                          }`}>
+                            {resumeUploaded
+                              ? <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                              : <FileText className="h-4 w-4 text-muted-foreground shrink-0" />}
+                            <span className="truncate text-muted-foreground">
+                              {resumeFile ? resumeFile.name : "Choose PDF / DOCX file…"}
+                            </span>
+                          </div>
+                          <input type="file" accept=".pdf,.doc,.docx,application/pdf" className="hidden"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0] || null;
+                              setResumeFile(f);
+                              setResumeUploaded(false);
+                              setValue("resumeUrl", "");
+                            }}
+                          />
+                        </label>
+                        <button type="button"
+                          disabled={!resumeFile || resumeUploading || resumeUploaded}
+                          onClick={() => uploadFile(
+                            resumeFile,
+                            (url) => setValue("resumeUrl", url),
+                            setResumeUploading, setResumeUploaded
+                          )}
+                          className="btn-primary text-sm px-3 h-11 shrink-0 disabled:opacity-40 flex items-center gap-1.5"
+                        >
+                          {resumeUploading
+                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                            : resumeUploaded
+                            ? <CheckCircle2 className="h-4 w-4" />
+                            : <Upload className="h-4 w-4" />}
+                          {resumeUploading ? "Uploading…" : resumeUploaded ? "Uploaded" : "Upload"}
+                        </button>
+                      </div>
+                      <input type="hidden" {...register("resumeUrl", {
+                        validate: (v) => !v || /^https?:\/\/.+/.test(v) || "Must be a valid URL",
+                      })} />
                       <Err name="resumeUrl" />
                     </div>
                   </div>
