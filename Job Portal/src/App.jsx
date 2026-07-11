@@ -21,13 +21,17 @@ import Notifications from "./pages/Notifications";
 import { JobsProvider } from "./context/JobsContext";
 import { ProfileProvider } from "./context/ProfileContext";
 import { NccProfileProvider } from "./context/NccProfileContext";
+import { NotificationProvider } from "./context/NotificationContext";
+import { MentorshipProvider } from "./context/MentorshipContext";
 
 export default function App() {
   return (
     <ProfileProvider>
       <NccProfileProvider>
         <JobsProvider>
-          <Routes>
+          <NotificationProvider>
+            <MentorshipProvider>
+              <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
@@ -48,8 +52,10 @@ export default function App() {
             <Route path="/ncc-profile" element={<NccCadetProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </JobsProvider>
-      </NccProfileProvider>
-    </ProfileProvider>
+        </MentorshipProvider>
+      </NotificationProvider>
+    </JobsProvider>
+  </NccProfileProvider>
+</ProfileProvider>
   );
 }

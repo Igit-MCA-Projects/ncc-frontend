@@ -4,15 +4,15 @@ import {
   Bell, Bookmark, Users, ChevronLeft, ChevronRight,
   Briefcase, MapPin, TrendingUp, Award, Sparkles,
   Clock, CheckCheck, UserCheck, ExternalLink, Mail,
-  Building2, BadgeCheck,
+  Building2, BadgeCheck, RefreshCw,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { useAuth } from "../context/AuthContext";
 import { useJobsContext } from "../context/JobsContext";
 import { useProfile } from "../context/ProfileContext";
-import notifications from "../data/notifications";
-import mentors from "../data/mentors";
+import { useNotificationContext } from "../context/NotificationContext";
+import { useMentorshipContext } from "../context/MentorshipContext";
 
 // ─── Quick stats ──────────────────────────────────────────────────────────────
 const stats = [
@@ -32,7 +32,9 @@ const NOTIF_META = {
 };
 
 function timeAgo(iso) {
+  if (!iso) return "recently";
   const d = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (isNaN(d) || d < 0) return "recently";
   if (d < 60) return `${d}s ago`;
   if (d < 3600) return `${Math.floor(d / 60)}m ago`;
   if (d < 86400) return `${Math.floor(d / 3600)}h ago`;
@@ -133,9 +135,10 @@ function SectionHeader({ icon: Icon, iconColor, title, count, linkTo, linkLabel 
 // ─── Notification card ────────────────────────────────────────────────────────
 function NotificationCard({ item }) {
   const meta = NOTIF_META[item.type] || NOTIF_META.GENERAL;
+  const isUnread = item.isRead === false; // Fallback if isRead is missing
   return (
-    <div className={`card-soft p-4 flex flex-col gap-3 relative ${!item.isRead ? "ring-1 ring-primary/20" : ""}`}>
-      {!item.isRead && (
+    <div className={`card-soft p-4 flex flex-col gap-3 relative ${isUnread ? "ring-1 ring-primary/20" : ""}`}>
+      {isUnread && (
         <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-primary animate-pulse" />
       )}
       <div className={`self-start text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
@@ -148,7 +151,7 @@ function NotificationCard({ item }) {
       <div className="mt-auto flex items-center gap-1 text-xs text-muted-foreground">
         <Clock className="h-3 w-3" />
         {timeAgo(item.createdAt)}
-        {item.isRead && <CheckCheck className="h-3 w-3 ml-auto text-green-500" />}
+        {!isUnread && <CheckCheck className="h-3 w-3 ml-auto text-green-500" />}
       </div>
     </div>
   );
@@ -239,33 +242,43 @@ function SavedJobCard({ item }) {
 }
 
 // ─── Mentor card ──────────────────────────────────────────────────────────────
-function MentorCard({ item }) {
+function MentorCard({ item, onConnect }) {
+  const isAvailable = item.available !== false;
+  const orgName = typeof item.organization === "object" ? item.organization?.name : item.organization;
+  const specialties = item.expertise || ["Leadership", "Career Guidance"];
+  const avatarUrl = item.profileImage || `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(item.fullName || "Mentor")}&backgroundColor=800000`;
+
   return (
     <div className="card-soft p-4 flex flex-col gap-3">
       <div className="flex items-center gap-3">
         <div className="relative shrink-0">
           <img
-            src={item.profileImage}
+            src={avatarUrl}
             alt={item.fullName}
             className="h-12 w-12 rounded-2xl ring-1 ring-border bg-muted object-cover"
+            onError={(e) => {
+              e.target.src = `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(item.fullName || "Mentor")}`;
+            }}
           />
           <span
             className={`absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-card ${
-              item.available ? "bg-green-500" : "bg-muted-foreground"
+              isAvailable ? "bg-green-500" : "bg-muted-foreground"
             }`}
           />
         </div>
         <div className="min-w-0">
           <p className="font-semibold text-sm truncate">{item.fullName}</p>
-          <p className="text-xs text-muted-foreground truncate">{item.designation}</p>
-          <p className="text-[10px] text-muted-foreground/70 truncate flex items-center gap-1">
-            <Building2 className="h-3 w-3 shrink-0" /> {item.organization}
-          </p>
+          <p className="text-xs text-muted-foreground truncate">{item.designation || "NCC Mentor & Advisor"}</p>
+          {orgName && (
+            <p className="text-[10px] text-muted-foreground/70 truncate flex items-center gap-1">
+              <Building2 className="h-3 w-3 shrink-0" /> {orgName}
+            </p>
+          )}
         </div>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {item.expertise.map((e) => (
+        {specialties.slice(0, 3).map((e) => (
           <span key={e} className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-primary/8 text-primary border border-primary/20">
             {e}
           </span>
@@ -273,14 +286,15 @@ function MentorCard({ item }) {
       </div>
 
       <div className={`text-[10px] font-semibold flex items-center gap-1 ${
-        item.available ? "text-green-600" : "text-muted-foreground"
+        isAvailable ? "text-green-600" : "text-muted-foreground"
       }`}>
         <BadgeCheck className="h-3 w-3" />
-        {item.available ? "Available for sessions" : "Currently unavailable"}
+        {isAvailable ? "Available for sessions" : "Currently unavailable"}
       </div>
 
       <button
-        disabled={!item.available}
+        onClick={() => onConnect(item)}
+        disabled={!isAvailable}
         className="mt-auto inline-flex items-center justify-center gap-1.5 text-xs font-semibold btn-primary h-8 disabled:opacity-40"
       >
         <UserCheck className="h-3 w-3" /> Connect
@@ -293,17 +307,58 @@ function MentorCard({ item }) {
 export default function Dashboard() {
   const { user } = useAuth();
   const { jobs, savedJobs, fetchJobs, fetchSavedJobs } = useJobsContext();
+  const { personalNotifications, fetchPersonalNotifications } = useNotificationContext();
+  const { mentors, fetchMentors, sendMentorshipRequest } = useMentorshipContext();
+
+  const [selectedMentor, setSelectedMentor] = useState(null);
+  const [note, setNote] = useState("hey i want your mentorship");
+  const [submittingConnect, setSubmittingConnect] = useState(false);
+  const [loadingRealData, setLoadingRealData] = useState(true);
 
   useEffect(() => {
-    fetchJobs().catch(() => {});
-    fetchSavedJobs().catch(() => {});
-  }, [fetchJobs, fetchSavedJobs]);
+    const loadAll = async () => {
+      setLoadingRealData(true);
+      try {
+        await Promise.all([
+          fetchJobs().catch(() => {}),
+          fetchSavedJobs().catch(() => {}),
+          fetchPersonalNotifications().catch(() => {}),
+          fetchMentors().catch(() => {}),
+        ]);
+      } catch (err) {
+        console.error("Dashboard failed to reload data: ", err);
+      } finally {
+        setLoadingRealData(false);
+      }
+    };
+    loadAll();
+  }, [fetchJobs, fetchSavedJobs, fetchPersonalNotifications, fetchMentors]);
 
   // Extract real job details from the savedJobs record list
   const realSavedJobs = (savedJobs || []).map((item) => item.job).filter(Boolean);
   // fallback: if none saved, show top 6 public jobs
   const displaySaved = realSavedJobs.length ? realSavedJobs : jobs.slice(0, 6);
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  
+  const displayNotifications = personalNotifications || [];
+  const unreadCount = displayNotifications.filter((n) => n.isRead === false).length;
+
+  const handleConnectMentor = (mentor) => {
+    setSelectedMentor(mentor);
+  };
+
+  const handleConfirmConnect = async () => {
+    if (!selectedMentor) return;
+    setSubmittingConnect(true);
+    try {
+      await sendMentorshipRequest({ teacherId: selectedMentor.id, note });
+      setSelectedMentor(null);
+      setNote("hey i want your mentorship");
+    } catch (err) {
+      // toast is already displayed inside sendMentorshipRequest context catch block
+    } finally {
+      setSubmittingConnect(false);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -332,29 +387,6 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      {/* ── Stats row ── */}
-      {/* <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((s, i) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06 }}
-            className="card-soft p-5"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</span>
-              <div
-                className="h-7 w-7 rounded-lg grid place-items-center"
-                style={{ background: `color-mix(in oklab, ${s.color} 15%, transparent)` }}
-              >
-                <s.icon className="h-3.5 w-3.5" style={{ color: s.color }} />
-              </div>
-            </div>
-            <div className="mt-3 text-2xl font-display font-extrabold">{s.value}</div>
-          </motion.div>
-        ))}
-      </div> */}
-
       {/* ═══════════════════════════════════════════
           SECTION 1 — NOTIFICATIONS
       ═══════════════════════════════════════════ */}
@@ -367,12 +399,23 @@ export default function Dashboard() {
           icon={Bell}
           iconColor="var(--ncc-maroon)"
           title="Notifications"
-          count={`${unreadCount} unread / ${notifications.length} total`}
+          count={`${unreadCount} unread / ${displayNotifications.length} total`}
+          linkTo="/notifications"
         />
-        <Carousel
-          items={notifications}
-          renderItem={(item) => <NotificationCard key={item.id} item={item} />}
-        />
+        {loadingRealData ? (
+          <div className="py-12 flex justify-center items-center gap-2 text-muted-foreground text-sm">
+            <RefreshCw className="h-4 w-4 animate-spin text-primary" /> Loading notifications...
+          </div>
+        ) : displayNotifications.length === 0 ? (
+          <div className="py-10 text-center text-muted-foreground text-sm italic">
+            No personal notifications found.
+          </div>
+        ) : (
+          <Carousel
+            items={displayNotifications}
+            renderItem={(item) => <NotificationCard key={item.id} item={item} />}
+          />
+        )}
       </motion.div>
 
       {/* ═══════════════════════════════════════════
@@ -391,10 +434,16 @@ export default function Dashboard() {
           linkTo="/saved-jobs"
           linkLabel="View saved"
         />
-        <Carousel
-          items={displaySaved}
-          renderItem={(item) => <SavedJobCard key={item.id} item={item} />}
-        />
+        {loadingRealData ? (
+          <div className="py-12 flex justify-center items-center gap-2 text-muted-foreground text-sm">
+            <RefreshCw className="h-4 w-4 animate-spin text-primary" /> Loading saved jobs...
+          </div>
+        ) : (
+          <Carousel
+            items={displaySaved}
+            renderItem={(item) => <SavedJobCard key={item.id} item={item} />}
+          />
+        )}
       </motion.div>
 
       {/* ═══════════════════════════════════════════
@@ -409,13 +458,78 @@ export default function Dashboard() {
           icon={Users}
           iconColor="var(--ncc-gold)"
           title="Mentor Connect"
-          count={`${mentors.filter((m) => m.available).length} available`}
+          count={`${(mentors || []).filter((m) => m.available !== false).length} available`}
         />
-        <Carousel
-          items={mentors}
-          renderItem={(item) => <MentorCard key={item.id} item={item} />}
-        />
+        {loadingRealData ? (
+          <div className="py-12 flex justify-center items-center gap-2 text-muted-foreground text-sm">
+            <RefreshCw className="h-4 w-4 animate-spin text-primary" /> Loading mentors...
+          </div>
+        ) : (mentors || []).length === 0 ? (
+          <div className="py-10 text-center text-muted-foreground text-sm italic">
+            No mentors are currently registered.
+          </div>
+        ) : (
+          <Carousel
+            items={mentors}
+            renderItem={(item) => (
+              <MentorCard key={item.id} item={item} onConnect={handleConnectMentor} />
+            )}
+          />
+        )}
       </motion.div>
+
+      {/* ═══════════════════════════════════════════
+          MENTORSHIP CONNECT MODAL Overlay (Custom UI)
+      ═══════════════════════════════════════════ */}
+      {selectedMentor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md bg-card border border-border p-6 rounded-3xl shadow-xl flex flex-col gap-4 text-left font-sans"
+          >
+            <div>
+              <h3 className="text-lg font-bold text-foreground">Connect with {selectedMentor.fullName}</h3>
+              <p className="text-xs text-muted-foreground mt-1 font-sans">
+                Send a personalized request message to request mentorship.
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-1.5 font-sans">
+              <label className="text-xs font-semibold text-muted-foreground font-sans">Mentorship Note</label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Brief note about why you want to connect..."
+                className="w-full h-24 p-3 rounded-2xl border border-border bg-muted/30 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none font-sans text-foreground"
+              />
+            </div>
+            
+            <div className="flex justify-end gap-2.5 mt-2 font-sans">
+              <button
+                onClick={() => setSelectedMentor(null)}
+                disabled={submittingConnect}
+                className="btn-outline px-4 py-2 text-xs font-semibold rounded-xl"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmConnect}
+                disabled={submittingConnect}
+                className="btn-primary px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5"
+              >
+                {submittingConnect ? (
+                  <>
+                    <RefreshCw className="h-3 w-3 animate-spin" /> Connecting...
+                  </>
+                ) : (
+                  "Request Mentorship"
+                )}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
