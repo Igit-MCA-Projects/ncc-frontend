@@ -14,6 +14,10 @@ import Settings from "./pages/Settings";
 import CareerAssistant from "./pages/CareerAssistant";
 import NccCadetProfile from "./pages/NccCadetProfile";
 import NotFound from "./pages/NotFound";
+import HiringCalendar from "./pages/HiringCalendar";
+import NccBenefits from "./pages/NccBenefits";
+import Scholarships from "./pages/Scholarships";
+import Notifications from "./pages/Notifications";
 import { JobsProvider } from "./context/JobsContext";
 import { ProfileProvider } from "./context/ProfileContext";
 import { NccProfileProvider } from "./context/NccProfileContext";
@@ -33,6 +37,10 @@ export default function App() {
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/:id" element={<JobDetails />} />
             <Route path="/saved-jobs" element={<SavedJobs />} />
+            <Route path="/hiring-calendar" element={<HiringCalendar />} />
+            <Route path="/ncc-benefits" element={<NccBenefits />} />
+            <Route path="/scholarships" element={<Scholarships />} />
+            <Route path="/notifications" element={<Notifications />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile-complete" element={<ProfileCompletionForm />} />
             <Route path="/settings" element={<Settings />} />
