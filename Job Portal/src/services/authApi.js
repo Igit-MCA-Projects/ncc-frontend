@@ -1,13 +1,8 @@
-import axios from "axios";
+import { api } from "./api";
 
 // Use a relative baseURL so requests go through the Vite dev proxy
 // (avoids CORS entirely in development). In production, update this to the real domain.
-const authAxios = axios.create({
-  baseURL: "/api/v1/auth",
-  timeout: 15000,
-  withCredentials: true,
-  headers: { "Content-Type": "application/json" },
-});
+
 
 /** Extract a human-readable error from the API response envelope. */
 function extractError(error) {
@@ -32,7 +27,7 @@ function assertSuccess(res) {
  */
 export async function registerStudent(payload) {
   try {
-    const res = await authAxios.post("/register", payload);
+    const res = await api.post("/auth/register", payload);
     console.log(res)
     return assertSuccess(res);
   } catch (err) {
@@ -48,7 +43,7 @@ export async function registerStudent(payload) {
  */
 export async function verifyEmail(payload) {
   try {
-    const res = await authAxios.post("/verify-email", payload);
+    const res = await api.post("/auth/verify-email", payload);
     return assertSuccess(res);
   } catch (err) {
     throw new Error(extractError(err));
@@ -64,7 +59,7 @@ export async function verifyEmail(payload) {
  */
 export async function loginStudent(credentials) {
   try {
-    const res = await authAxios.post("/login", credentials);
+    const res = await api.post("/auth/login", credentials);
     return assertSuccess(res);
   } catch (err) {
     throw new Error(extractError(err));
@@ -79,7 +74,7 @@ export async function loginStudent(credentials) {
  */
 export async function logoutStudent() {
   try {
-    const res = await authAxios.post("/logout");
+    const res = await api.post("/auth/logout");
     return assertSuccess(res);
   } catch (err) {
     throw new Error(extractError(err));
@@ -95,7 +90,7 @@ export async function logoutStudent() {
  */
 export async function getMe() {
   try {
-    const res = await authAxios.get("/me");
+    const res = await api.get("/auth/me");
     return assertSuccess(res);
   } catch (err) {
     throw new Error(extractError(err));

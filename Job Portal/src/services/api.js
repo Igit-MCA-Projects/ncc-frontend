@@ -33,7 +33,6 @@ export async function getJob(id) {
 /** GET /student/profile — returns the full profile envelope */
 export async function getStudentProfile() {
   const res = await api.get("/student/profile");
-  console.log("studentProfileres");
   if (!res.data?.success) throw new Error(res.data?.message || "Failed to load profile");
   return res.data.data; // the profile object (or null when not complete)
 }
