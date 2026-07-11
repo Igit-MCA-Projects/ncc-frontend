@@ -8,7 +8,7 @@ import jobs from "../data/jobs";
 import savedJobs from "../data/savedJobs";
 
 export const api = axios.create({
-  baseURL: "/api/v1",
+  baseURL: import.meta.env.VITE_BACKEND_URL,
   timeout: 10000,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
