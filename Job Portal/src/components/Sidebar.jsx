@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Briefcase, Bookmark, User, Settings, LogOut, Shield, X, Bot, ShieldCheck,
-  Calendar, GraduationCap, Bell,
+  Calendar, GraduationCap, Bell, Users,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
@@ -17,6 +17,7 @@ const items = [
   { to: "/hiring-calendar", label: "Hiring Calendar", icon: Calendar },
   { to: "/ncc-benefits", label: "NCC Benefits", icon: Shield },
   { to: "/scholarships", label: "Scholarships", icon: GraduationCap },
+  { to: "/mentorship-status", label: "Mentorship Status", icon: Users },
   { to: "/notifications", label: "Notifications", icon: Bell },
   { to: "/settings", label: "Settings", icon: Settings },
 ];

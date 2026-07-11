@@ -28,3 +28,12 @@ export async function requestMentorship({ teacherId, note }) {
   }
   return res.data;
 }
+
+/** GET /student/mentorship — Fetch mentorship requests sent by this student */
+export async function getMentorshipStatus() {
+  const res = await api.get("/student/mentorship");
+  if (!res.data?.success) {
+    throw new Error(res.data?.message || "Failed to fetch mentorship status");
+  }
+  return res.data.data;
+}
