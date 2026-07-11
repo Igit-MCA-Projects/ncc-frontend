@@ -720,9 +720,5 @@ function NccCadetProfileInner() {
    PAGE EXPORT
 ───────────────────────────────────────────── */
 export default function NccCadetProfile() {
-  return (
-    <NccProfileProvider>
-      <NccCadetProfileInner />
-    </NccProfileProvider>
-  );
+  return <NccCadetProfileInner />;
 }

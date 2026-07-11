@@ -729,11 +729,7 @@ function ProfileCompletionFormInner() {
 // ─── Page export ──────────────────────────────────────────────────────────────
 
 export default function ProfileCompletionForm() {
-  return (
-    <ProfileProvider>
-      <ProfileCompletionFormInner />
-    </ProfileProvider>
-  );
+  return <ProfileCompletionFormInner />;
 }
 
 // ─── Style helpers ────────────────────────────────────────────────────────────

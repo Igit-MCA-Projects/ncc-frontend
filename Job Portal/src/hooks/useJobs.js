@@ -1,13 +1,20 @@
-import { useEffect, useState } from "react";
-import { getJobs } from "../services/api";
+import { useEffect } from "react";
+import { useJobsContext } from "../context/JobsContext";
 
 export function useJobs() {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { jobs, loading, error, fetchJobs, fetchSavedJobs, toggleSaveJob, savedJobsMap } = useJobsContext();
+
   useEffect(() => {
-    let alive = true;
-    getJobs().then((d) => alive && (setJobs(d), setLoading(false)));
-    return () => { alive = false; };
-  }, []);
-  return { jobs, loading };
+    fetchJobs().catch(() => {});
+    fetchSavedJobs().catch(() => {});
+  }, [fetchJobs, fetchSavedJobs]);
+
+  return {
+    jobs,
+    loading,
+    error,
+    fetchJobs,
+    toggleSaveJob,
+    savedJobsMap,
+  };
 }

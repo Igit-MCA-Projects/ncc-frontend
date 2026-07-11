@@ -574,9 +574,7 @@ function ProfileInner() {
 export default function Profile() {
   return (
     <DashboardLayout>
-      <ProfileProvider>
-        <ProfileInner />
-      </ProfileProvider>
+      <ProfileInner />
     </DashboardLayout>
   );
 }
