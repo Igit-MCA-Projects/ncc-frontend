@@ -37,3 +37,12 @@ export async function getMentorshipStatus() {
   }
   return res.data.data;
 }
+
+/** DELETE /student/mentorship — Remove mentorship request by mentorshipId */
+export async function deleteMentorshipRequest(mentorshipId) {
+  const res = await api.delete(`/student/mentorship?mentorshipId=${mentorshipId}`);
+  if (!res.data?.success) {
+    throw new Error(res.data?.message || "Failed to delete mentorship request");
+  }
+  return res.data;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Users, Clock, CheckCircle2, XCircle, AlertCircle, RefreshCw, Phone, Mail, Calendar, MessageSquare, ArrowRight } from "lucide-react";
+import { Users, Clock, CheckCircle2, XCircle, AlertCircle, RefreshCw, Phone, Mail, Calendar, MessageSquare, ArrowRight, Trash2 } from "lucide-react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { useMentorshipContext } from "../context/MentorshipContext";
 import toast from "react-hot-toast";
@@ -40,7 +40,7 @@ function formatDate(isoString) {
 }
 
 export default function MentorshipStatus() {
-  const { mentorshipRequests, loading, fetchMentorshipRequests } = useMentorshipContext();
+  const { mentorshipRequests, loading, fetchMentorshipRequests, deleteMentorship } = useMentorshipContext();
   const [filter, setFilter] = useState("ALL");
 
   useEffect(() => {
@@ -207,10 +207,27 @@ export default function MentorshipStatus() {
                 <div className="flex flex-row md:flex-col justify-between md:justify-start md:items-end gap-3 shrink-0 border-t md:border-t-0 md:border-l border-border/60 pt-3.5 md:pt-0 md:pl-5">
                   <div className="flex flex-col gap-2 md:items-end">
                     <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Connection Status</span>
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${meta.color}`}>
-                      <StatusIcon className="h-3.5 w-3.5" />
-                      {meta.label}
-                    </span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${meta.color}`}>
+                        <StatusIcon className="h-3.5 w-3.5" />
+                        {meta.label}
+                      </span>
+                      <button
+                        onClick={async () => {
+                         
+                            try {
+                              await deleteMentorship(req.id);
+                            } catch (err) {
+                              // Already handled
+                            }
+                          
+                        }}
+                        className="p-1.5 rounded-xl text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 hover:text-rose-700 transition-colors shrink-0"
+                        title="Delete Mentorship Request"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex flex-col gap-1.5 text-xs text-muted-foreground md:text-right mt-1">

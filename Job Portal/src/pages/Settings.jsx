@@ -9,7 +9,7 @@ export default function Settings() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [dark, setDark] = useState(false);
-  const [notify, setNotify] = useState(true);
+  
 
   const handleLogout = () => { logout(); toast.success("Logged out"); navigate("/"); };
 
@@ -20,7 +20,7 @@ export default function Settings() {
 
       <div className="mt-6 grid gap-4 max-w-2xl">
         <Toggle icon={Moon} title="Dark mode" desc="Easier on the eyes during late drills." value={dark} onChange={setDark}/>
-        <Toggle icon={Bell} title="Notifications" desc="Job matches, applications and reminders." value={notify} onChange={setNotify}/>
+        
 
         <div className="card-soft p-5 flex items-center justify-between">
           <div>

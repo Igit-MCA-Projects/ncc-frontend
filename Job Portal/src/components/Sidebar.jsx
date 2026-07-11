@@ -12,12 +12,12 @@ const items = [
   { to: "/profile", label: "Profile", icon: User },
   { to: "/ncc-profile", label: "NCC Profile", icon: ShieldCheck },
   { to: "/career-assistant", label: "Career Assistant", icon: Bot },
+  { to: "/mentorship-status", label: "Mentorship Status", icon: Users },
   { to: "/jobs", label: "Jobs", icon: Briefcase },
   { to: "/saved-jobs", label: "Saved Jobs", icon: Bookmark },
   { to: "/hiring-calendar", label: "Hiring Calendar", icon: Calendar },
   { to: "/ncc-benefits", label: "NCC Benefits", icon: Shield },
   { to: "/scholarships", label: "Scholarships", icon: GraduationCap },
-  { to: "/mentorship-status", label: "Mentorship Status", icon: Users },
   { to: "/notifications", label: "Notifications", icon: Bell },
   { to: "/settings", label: "Settings", icon: Settings },
 ];

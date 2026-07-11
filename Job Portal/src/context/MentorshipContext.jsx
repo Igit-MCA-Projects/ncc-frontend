@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from "react";
-import { getAllMentors, requestMentorship, getMentorshipStatus } from "../services/mentorshipApi";
+import { getAllMentors, requestMentorship, getMentorshipStatus, deleteMentorshipRequest } from "../services/mentorshipApi";
 import toast from "react-hot-toast";
 
 const MentorshipContext = createContext(null);
@@ -60,6 +60,23 @@ export function MentorshipProvider({ children }) {
     }
   }, [fetchMentors, fetchMentorshipRequests]);
 
+  const deleteMentorship = useCallback(async (mentorshipId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await deleteMentorshipRequest(mentorshipId);
+      toast.success("Mentorship request deleted successfully!");
+      setMentorshipRequests((prev) => prev.filter((item) => item.id !== mentorshipId));
+      return res;
+    } catch (err) {
+      setError(err.message || "Failed to delete mentorship request");
+      toast.error(err.message || "Failed to delete mentorship request");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return (
     <MentorshipContext.Provider
       value={{
@@ -70,6 +87,7 @@ export function MentorshipProvider({ children }) {
         fetchMentors,
         fetchMentorshipRequests,
         sendMentorshipRequest,
+        deleteMentorship,
       }}
     >
       {children}

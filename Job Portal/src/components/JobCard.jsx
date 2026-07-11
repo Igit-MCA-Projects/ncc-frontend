@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Bookmark, MapPin, IndianRupee, Briefcase, Sparkles, Check, X } from "lucide-react";
+import { Bookmark, MapPin, IndianRupee, Briefcase, Sparkles, Check, X, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useJobsContext } from "../context/JobsContext";
 import { useProfile } from "../context/ProfileContext";
@@ -134,11 +134,22 @@ export default function JobCard({ job, index = 0 }) {
         <Link to={`/jobs/${job.id}`} className="btn-primary text-xs flex-1 text-center py-2 h-9 flex items-center justify-center font-bold">
           View Details
         </Link>
-        <button onClick={handleToggle} className={`btn-outline text-xs px-2.5 h-9 font-bold transition-all ${
-          saved ? "bg-muted text-foreground" : ""
-        }`}>
-          {saved ? "Saved" : "Save"}
-        </button>
+        {saved ? (
+          <button
+            onClick={handleToggle}
+            className="btn-outline h-9 px-3 text-rose-600 hover:bg-rose-50 border-rose-200 hover:border-rose-300 transition-colors shrink-0 flex items-center justify-center rounded-xl"
+            title="Unsave Job"
+          >
+            <Trash2 className="h-4.5 w-4.5" />
+          </button>
+        ) : (
+          <button
+            onClick={handleToggle}
+            className="btn-outline text-xs px-2.5 h-9 font-bold"
+          >
+            Save
+          </button>
+        )}
       </div>
     </motion.div>
   );

@@ -57,7 +57,7 @@ export function JobsProvider({ children }) {
     if (savedJobId) {
       // Unsave the job
       try {
-        await deleteSavedJob(savedJobId);
+        await deleteSavedJob(savedJobId, jobId);
         // update local list
         setSavedJobs((prev) => prev.filter((item) => item.id !== savedJobId));
         // update map

@@ -21,9 +21,11 @@ export async function saveJob(jobId) {
   return res.data.data; // returns the created savedJob record (containing its id)
 }
 
-/** DELETE /student/save-job — Remove bookmark by savedJobId (id query param) */
-export async function deleteSavedJob(savedJobId) {
-  const res = await api.delete(`/student/save-job?id=${savedJobId}`);
+/** DELETE /student/save-job — Remove bookmark by savedJobId (id query param) and jobId (body) */
+export async function deleteSavedJob(savedJobId, jobId) {
+  const res = await api.delete(`/student/save-job?id=${savedJobId}`, {
+    data: { jobId }
+  });
   if (!res.data?.success) throw new Error(res.data?.message || "Failed to remove saved job");
   return res.data;
 }
