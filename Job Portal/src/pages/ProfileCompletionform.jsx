@@ -25,7 +25,7 @@ const SOCIAL_PLATFORMS = ["GitHub", "LinkedIn", "Portfolio", "Twitter", "LeetCod
 
 const STEPS = [
   { label: "Personal Info",  fields: ["phone", "dateOfBirth", "gender", "headline", "bio", "profileImage", "resumeUrl"] },
-  { label: "Preferences",    fields: ["preferredRole", "expectedSalary", "preferredLocation", "willingToRelocate", "openToRemote"] },
+  { label: "Preferences",    fields: ["preferredRole", "expectedSalary", "preferredLocation", "willingToRelocate", "openToRemote", "skills"] },
   { label: "Addresses",      fields: ["addresses"] },
   { label: "Education",      fields: ["educations"] },
   { label: "Social Links",   fields: ["socialLinks"] },
@@ -43,6 +43,7 @@ const defaultValues = {
   resumeUrl: "",
   preferredRole: "",
   preferredLocation: [],
+  skills: [],
   expectedSalary: "",
   willingToRelocate: false,
   openToRemote: false,
@@ -67,6 +68,7 @@ function ProfileCompletionFormInner() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false); // local — NOT from context
   const [locationInput, setLocationInput] = useState("");
+  const [skillInput, setSkillInput] = useState("");
 
   // ── File upload state ──────────────────────────────────────────────────────
   const [imageFile, setImageFile]       = useState(null);   // selected File object
@@ -116,6 +118,7 @@ function ProfileCompletionFormInner() {
   const socialArray   = useFieldArray({ control, name: "socialLinks" });
 
   const preferredLocation = watch("preferredLocation");
+  const skills = watch("skills");
 
   // ── Location chip helpers ──────────────────────────────────────────────────
   const addLocation = () => {
@@ -127,6 +130,14 @@ function ProfileCompletionFormInner() {
   };
   const removeLocation = (loc) =>
     setValue("preferredLocation", preferredLocation.filter((l) => l !== loc));
+
+  // ── Skill chip helpers ─────────────────────────────────────────────────────
+  const addSkill = () => {
+    const s = skillInput.trim().toLowerCase();
+    if (s && !skills.includes(s)) setValue("skills", [...skills, s]);
+    setSkillInput("");
+  };
+  const removeSkill = (s) => setValue("skills", skills.filter((x) => x !== s));
 
   // ── Step navigation ────────────────────────────────────────────────────────
   const goNext = async () => {
@@ -170,6 +181,7 @@ function ProfileCompletionFormInner() {
       socialLinks: formData.socialLinks
         .filter((s) => s.url.trim())
         .map((s) => ({ platform: s.platform, url: s.url })),
+      skills: formData.skills?.length ? formData.skills : undefined,
     };
 
     console.log("📤 Submitting profile payload:", JSON.stringify(payload, null, 2));
@@ -464,6 +476,30 @@ function ProfileCompletionFormInner() {
                           <span className="text-sm font-medium">Open to Remote</span>
                         </label>
                       )} />
+
+                    {/* Skills chips */}
+                    <div className="sm:col-span-2">
+                      <F label="Skills">
+                        <div className="flex gap-2">
+                          <input value={skillInput}
+                            onChange={(e) => setSkillInput(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())}
+                            placeholder="e.g. React, Node.js…"
+                            className="flex-1 h-11 px-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 text-sm" />
+                          <button type="button" onClick={addSkill} className="btn-primary text-sm px-4">Add</button>
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {skills.map((s) => (
+                            <span key={s} className="chip inline-flex items-center gap-1">
+                              {s}
+                              <button type="button" onClick={() => removeSkill(s)} className="hover:text-destructive">
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </F>
+                    </div>
                   </div>
                 )}
 

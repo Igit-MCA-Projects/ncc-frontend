@@ -8,11 +8,11 @@ import toast from "react-hot-toast";
 
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/jobs", label: "Jobs", icon: Briefcase },
-  { to: "/saved-jobs", label: "Saved Jobs", icon: Bookmark },
   { to: "/profile", label: "Profile", icon: User },
   { to: "/ncc-profile", label: "NCC Profile", icon: ShieldCheck },
   { to: "/career-assistant", label: "Career Assistant", icon: Bot },
+  { to: "/jobs", label: "Jobs", icon: Briefcase },
+  { to: "/saved-jobs", label: "Saved Jobs", icon: Bookmark },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 

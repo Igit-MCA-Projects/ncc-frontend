@@ -45,6 +45,13 @@ export async function completeStudentProfile(payload) {
   return res.data;
 }
 
+/** PUT /student/profile — partial update of the profile */
+export async function updateStudentProfile(payload) {
+  const res = await api.put("/student/profile", payload);
+  if (!res.data?.success) throw new Error(res.data?.message || "Failed to update profile");
+  return res.data;
+}
+
 // ─── Saved Jobs ──────────────────────────────────────────────────────────────
 
 export async function getSavedJobs() {
