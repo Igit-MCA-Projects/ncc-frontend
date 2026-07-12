@@ -1,12 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { Shield, Mail, Lock, User, Eye, EyeOff, RefreshCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
-  const { register, verifyEmail } = useAuth();
+  const { register, verifyEmail, resendOtp } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ fullname: "", email: "", password: "" });
@@ -16,6 +16,21 @@ export default function Register() {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [otpLoading, setOtpLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0); // seconds remaining
+  const cooldownRef = useRef(null);
+
+  // ── Count-down timer ────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    cooldownRef.current = setInterval(() => {
+      setResendCooldown((s) => {
+        if (s <= 1) { clearInterval(cooldownRef.current); return 0; }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(cooldownRef.current);
+  }, [resendCooldown]);
 
   // ── Validation ──────────────────────────────────────────────────────────────
   const validate = () => {
@@ -81,6 +96,23 @@ export default function Register() {
       toast.error(err.message);
     } finally {
       setOtpLoading(false);
+    }
+  };
+
+  // ── Resend OTP ──────────────────────────────────────────────────────────────
+  const handleResendOtp = async () => {
+    if (resendLoading || resendCooldown > 0) return;
+    setResendLoading(true);
+    try {
+      await resendOtp({ email: form.email });
+      toast.success("OTP resent! Check your email.");
+      setResendCooldown(30); // 30-second cooldown
+      setOtp(["", "", "", ""]);
+      document.getElementById("otp-0")?.focus();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -241,6 +273,28 @@ export default function Register() {
                 >
                   {otpLoading ? "Verifying…" : "Verify OTP"}
                 </button>
+
+                {/* Resend OTP */}
+                <div className="flex flex-col items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={resendLoading || resendCooldown > 0}
+                    className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                  >
+                    <RefreshCw
+                      className={`h-3.5 w-3.5 ${resendLoading ? "animate-spin" : ""}`}
+                    />
+                    {resendLoading
+                      ? "Resending…"
+                      : resendCooldown > 0
+                      ? `Resend OTP (${resendCooldown}s)`
+                      : "Resend OTP"}
+                  </button>
+                  <p className="text-[11px] text-muted-foreground">
+                    Didn't receive the code?
+                  </p>
+                </div>
 
                 <button
                   type="button"

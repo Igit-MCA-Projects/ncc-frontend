@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import * as authApi from "../services/authApi";
 
+
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -36,6 +37,10 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const resendOtp = async ({ email }) => {
+    return await authApi.resendOtp({ email });
+  };
+
   const logout = async () => {
     try {
       await authApi.logoutStudent();
@@ -46,7 +51,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, ready, register, verifyEmail, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, ready, register, verifyEmail, resendOtp, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

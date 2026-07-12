@@ -49,6 +49,21 @@ export async function verifyEmail(payload) {
   }
 }
 
+// ─── Resend OTP ───────────────────────────────────────────────────────────────
+
+/**
+ * POST /auth/resend-otp
+ * @param {{ email: string }} payload
+ */
+export async function resendOtp(payload) {
+  try {
+    const res = await api.post("/auth/resend-otp", payload);
+    return assertSuccess(res);
+  } catch (err) {
+    throw new Error(extractError(err));
+  }
+}
+
 // ─── Student Login ───────────────────────────────────────────────────────────
 
 /**
