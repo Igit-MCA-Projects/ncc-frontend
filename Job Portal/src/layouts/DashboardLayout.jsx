@@ -15,17 +15,17 @@ export default function DashboardLayout({ children }) {
         <div className="flex-1 min-w-0 flex flex-col">
           <header className="sticky top-0 z-20 h-16 bg-card/80 backdrop-blur border-b border-border flex items-center gap-3 px-4 sm:px-6">
             <button onClick={() => setOpen(true)} className="lg:hidden p-2 -ml-2" aria-label="Menu">
-              <Menu className="h-5 w-5"/>
+              <Menu className="h-5 w-5" />
             </button>
             <div className="relative flex-1 max-w-xl">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 placeholder="Search jobs, companies…"
                 className="w-full h-10 pl-9 pr-4 rounded-xl bg-muted/60 border border-transparent focus:border-border focus:bg-card focus:outline-none text-sm"
               />
             </div>
             <button className="relative p-2 rounded-full hover:bg-muted" aria-label="Notifications">
-              <Bell className="h-5 w-5"/>
+              <Bell className="h-5 w-5" />
               <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-primary" />
             </button>
             <img

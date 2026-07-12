@@ -23,7 +23,9 @@ export default function Navbar() {
           </div>
           <div className="leading-tight">
             <div className="font-display font-extrabold text-foreground">NCC Career AI</div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Cadet · Career · AI</div>
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              Cadet · Career · AI
+            </div>
           </div>
         </Link>
 
@@ -32,7 +34,7 @@ export default function Navbar() {
             <Link
               key={l.to}
               to={l.to}
-             
+
               className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
             >
               {l.label}
@@ -42,11 +44,20 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-3">
           {user ? (
-            <Link to="/dashboard" className="btn-primary">Dashboard</Link>
+            <Link to="/dashboard" className="btn-primary">
+              Dashboard
+            </Link>
           ) : (
             <>
-              <Link to="/login" className="text-sm font-semibold text-foreground/80 hover:text-primary">Login</Link>
-              <Link to="/register" className="btn-primary">Get started</Link>
+              <Link
+                to="/login"
+                className="text-sm font-semibold text-foreground/80 hover:text-primary"
+              >
+                Login
+              </Link>
+              <Link to="/register" className="btn-primary">
+                Get started
+              </Link>
             </>
           )}
         </div>
@@ -60,16 +71,39 @@ export default function Navbar() {
         <div className="md:hidden border-t border-border bg-card">
           <div className="px-4 py-3 flex flex-col gap-3">
             {links.map((l) => (
-              <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="py-1 font-medium">
+              <Link
+                key={l.to}
+                to={l.to}
+                onClick={() => setOpen(false)}
+                className="py-1 font-medium"
+              >
                 {l.label}
               </Link>
             ))}
             {user ? (
-              <Link to="/dashboard" className="btn-primary text-center" onClick={() => setOpen(false)}>Dashboard</Link>
+              <Link
+                to="/dashboard"
+                className="btn-primary text-center"
+                onClick={() => setOpen(false)}
+              >
+                Dashboard
+              </Link>
             ) : (
               <div className="flex gap-2">
-                <Link to="/login" className="btn-outline flex-1 text-center" onClick={() => setOpen(false)}>Login</Link>
-                <Link to="/register" className="btn-primary flex-1 text-center" onClick={() => setOpen(false)}>Register</Link>
+                <Link
+                  to="/login"
+                  className="btn-outline flex-1 text-center"
+                  onClick={() => setOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="btn-primary flex-1 text-center"
+                  onClick={() => setOpen(false)}
+                >
+                  Register
+                </Link>
               </div>
             )}
           </div>

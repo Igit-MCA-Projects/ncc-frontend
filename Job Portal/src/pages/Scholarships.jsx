@@ -1,5 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
-import { GraduationCap, Search, DollarSign, FileText, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import {
+  GraduationCap,
+  Search,
+  DollarSign,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+} from "lucide-react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { getScholarships } from "../services/publicApi";
 import toast from "react-hot-toast";
@@ -34,7 +42,8 @@ export default function Scholarships() {
         item.name?.toLowerCase().includes(search.toLowerCase()) ||
         item.eligibility?.toLowerCase().includes(search.toLowerCase()) ||
         item.amount?.toLowerCase().includes(search.toLowerCase()) ||
-        (item.requiredDocument && item.requiredDocument.some((d) => d.toLowerCase().includes(search.toLowerCase())));
+        (item.requiredDocument &&
+          item.requiredDocument.some((d) => d.toLowerCase().includes(search.toLowerCase())));
 
       return matchSearch;
     });
@@ -104,7 +113,8 @@ export default function Scholarships() {
                 <tr>
                   <td colSpan="4" className="p-10 text-center text-muted-foreground">
                     <div className="flex justify-center items-center gap-2">
-                      <RefreshCw className="h-5 w-5 animate-spin text-primary" /> Loading scholarships...
+                      <RefreshCw className="h-5 w-5 animate-spin text-primary" /> Loading
+                      scholarships...
                     </div>
                   </td>
                 </tr>
@@ -127,13 +137,18 @@ export default function Scholarships() {
                       <div className="flex flex-wrap gap-1.5">
                         {item.requiredDocument?.length > 0 ? (
                           item.requiredDocument.map((doc, idx) => (
-                            <span key={idx} className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-muted border border-border/80 text-muted-foreground">
+                            <span
+                              key={idx}
+                              className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-muted border border-border/80 text-muted-foreground"
+                            >
                               <FileText className="h-3 w-3 text-muted-foreground/80" />
                               {doc}
                             </span>
                           ))
                         ) : (
-                          <span className="text-xs text-muted-foreground/75 italic">None listed</span>
+                          <span className="text-xs text-muted-foreground/75 italic">
+                            None listed
+                          </span>
                         )}
                       </div>
                     </td>
@@ -158,7 +173,8 @@ export default function Scholarships() {
         {!loading && filteredItems.length > 0 && (
           <div className="p-4 bg-muted/20 border-t border-border flex items-center justify-between text-sm">
             <span className="text-muted-foreground">
-              Showing <strong className="text-foreground">{(currentPage - 1) * itemsPerPage + 1}</strong> to{" "}
+              Showing{" "}
+              <strong className="text-foreground">{(currentPage - 1) * itemsPerPage + 1}</strong> to{" "}
               <strong className="text-foreground">
                 {Math.min(currentPage * itemsPerPage, filteredItems.length)}
               </strong>{" "}

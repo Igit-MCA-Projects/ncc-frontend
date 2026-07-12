@@ -7,7 +7,9 @@ export default function Modal({ open, onClose, title, children }) {
       {open && (
         <motion.div
           className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           onClick={onClose}
         >
           <motion.div
@@ -20,7 +22,9 @@ export default function Modal({ open, onClose, title, children }) {
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold">{title}</h3>
-              <button onClick={onClose} className="p-1 rounded hover:bg-muted"><X className="h-4 w-4"/></button>
+              <button onClick={onClose} className="p-1 rounded hover:bg-muted">
+                <X className="h-4 w-4" />
+              </button>
             </div>
             {children}
           </motion.div>

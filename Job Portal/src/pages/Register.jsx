@@ -30,13 +30,20 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      return;
+    }
     setErrors({});
     setLoading(true);
     try {
-        console.log("api call done")
-      const res = await register({ fullName: form.fullname, email: form.email, password: form.password });
-      console.log("api call res",res);
+      console.log("api call done");
+      const res = await register({
+        fullName: form.fullname,
+        email: form.email,
+        password: form.password,
+      });
+      console.log("api call res", res);
       toast.success("Account created! Check your email for the OTP.");
       setOtpStep(true);
     } catch (err) {
@@ -108,9 +115,7 @@ export default function Register() {
           className="w-full max-w-md card-soft p-8 relative"
         >
           <h1 className="text-2xl font-display font-extrabold">Create account</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Fill in your details to get started.
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">Fill in your details to get started.</p>
 
           <div className="mt-6 space-y-4">
             {/* Full Name */}

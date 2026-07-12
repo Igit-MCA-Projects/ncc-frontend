@@ -1,5 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
-import { Shield, Search, Award, GraduationCap, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import {
+  Shield,
+  Search,
+  Award,
+  GraduationCap,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+} from "lucide-react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { getNccBenefits } from "../services/publicApi";
 import toast from "react-hot-toast";
@@ -70,7 +78,8 @@ export default function NccBenefits() {
             NCC Benefits
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Explore reservation quotas, bonus points, and scholarship benefits unlocked by your certificates.
+            Explore reservation quotas, bonus points, and scholarship benefits unlocked by your
+            certificates.
           </p>
         </div>
         <button
@@ -125,7 +134,8 @@ export default function NccBenefits() {
                 <tr>
                   <td colSpan="5" className="p-10 text-center text-muted-foreground">
                     <div className="flex justify-center items-center gap-2">
-                      <RefreshCw className="h-5 w-5 animate-spin text-primary" /> Loading benefits...
+                      <RefreshCw className="h-5 w-5 animate-spin text-primary" /> Loading
+                      benefits...
                     </div>
                   </td>
                 </tr>
@@ -149,7 +159,9 @@ export default function NccBenefits() {
                     </td>
                     <td className="p-4 sm:p-5 font-semibold text-foreground/90">
                       {item.bonusMark || (
-                        <span className="text-xs text-muted-foreground/75 italic">Varies by scheme</span>
+                        <span className="text-xs text-muted-foreground/75 italic">
+                          Varies by scheme
+                        </span>
                       )}
                     </td>
                     <td className="p-4 sm:p-5">
@@ -158,7 +170,9 @@ export default function NccBenefits() {
                           {item.nccQuota}
                         </span>
                       ) : (
-                        <span className="text-xs text-muted-foreground/70 italic">None specified</span>
+                        <span className="text-xs text-muted-foreground/70 italic">
+                          None specified
+                        </span>
                       )}
                     </td>
                     <td className="p-4 sm:p-5">
@@ -172,15 +186,21 @@ export default function NccBenefits() {
                         {item.scholarships?.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mt-0.5">
                             {item.scholarships.map((s, idx) => (
-                              <span key={idx} className="text-[10px] bg-muted px-2 py-0.5 rounded-md border border-border/80 text-muted-foreground">
+                              <span
+                                key={idx}
+                                className="text-[10px] bg-muted px-2 py-0.5 rounded-md border border-border/80 text-muted-foreground"
+                              >
                                 {s}
                               </span>
                             ))}
                           </div>
                         )}
-                        {!item.Scholarship && (!item.scholarships || item.scholarships.length === 0) && (
-                          <span className="text-xs text-muted-foreground/70 italic">No scholarships listed</span>
-                        )}
+                        {!item.Scholarship &&
+                          (!item.scholarships || item.scholarships.length === 0) && (
+                            <span className="text-xs text-muted-foreground/70 italic">
+                              No scholarships listed
+                            </span>
+                          )}
                       </div>
                     </td>
                   </tr>
@@ -194,7 +214,8 @@ export default function NccBenefits() {
         {!loading && filteredItems.length > 0 && (
           <div className="p-4 bg-muted/20 border-t border-border flex items-center justify-between text-sm">
             <span className="text-muted-foreground">
-              Showing <strong className="text-foreground">{(currentPage - 1) * itemsPerPage + 1}</strong> to{" "}
+              Showing{" "}
+              <strong className="text-foreground">{(currentPage - 1) * itemsPerPage + 1}</strong> to{" "}
               <strong className="text-foreground">
                 {Math.min(currentPage * itemsPerPage, filteredItems.length)}
               </strong>{" "}

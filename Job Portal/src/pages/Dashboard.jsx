@@ -1,10 +1,24 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  Bell, Bookmark, Users, ChevronLeft, ChevronRight,
-  Briefcase, MapPin, TrendingUp, Award, Sparkles,
-  Clock, CheckCheck, UserCheck, ExternalLink, Mail,
-  Building2, BadgeCheck, RefreshCw,
+  Bell,
+  Bookmark,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+  Briefcase,
+  MapPin,
+  TrendingUp,
+  Award,
+  Sparkles,
+  Clock,
+  CheckCheck,
+  UserCheck,
+  ExternalLink,
+  Mail,
+  Building2,
+  BadgeCheck,
+  RefreshCw,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -16,19 +30,31 @@ import { useMentorshipContext } from "../context/MentorshipContext";
 
 // ─── Quick stats ──────────────────────────────────────────────────────────────
 const stats = [
-  { label: "Applications", value: 8,    icon: Briefcase,  color: "var(--ncc-maroon)" },
-  { label: "Saved Jobs",   value: 12,   icon: Bookmark,   color: "var(--ncc-army)" },
-  { label: "Profile Views",value: 47,   icon: TrendingUp, color: "var(--ncc-gold)" },
-  { label: "NCC Bonus",    value: "+12%",icon: Award,      color: "var(--ncc-maroon)" },
+  { label: "Applications", value: 8, icon: Briefcase, color: "var(--ncc-maroon)" },
+  { label: "Saved Jobs", value: 12, icon: Bookmark, color: "var(--ncc-army)" },
+  { label: "Profile Views", value: 47, icon: TrendingUp, color: "var(--ncc-gold)" },
+  { label: "NCC Bonus", value: "+12%", icon: Award, color: "var(--ncc-maroon)" },
 ];
 
 // ─── Notification type styles ─────────────────────────────────────────────────
 const NOTIF_META = {
-  JOB_MATCH:   { label: "Job Match",   color: "text-[color:var(--ncc-army)]",   bg: "bg-[color:var(--ncc-army)]/10" },
-  PROFILE:     { label: "Profile",     color: "text-[color:var(--ncc-gold)]",   bg: "bg-[color:var(--ncc-gold)]/10" },
-  APPLICATION: { label: "Application", color: "text-[color:var(--ncc-maroon)]", bg: "bg-[color:var(--ncc-maroon)]/10" },
-  MENTOR:      { label: "Mentor",      color: "text-primary",                   bg: "bg-primary/10" },
-  GENERAL:     { label: "General",     color: "text-muted-foreground",          bg: "bg-muted" },
+  JOB_MATCH: {
+    label: "Job Match",
+    color: "text-[color:var(--ncc-army)]",
+    bg: "bg-[color:var(--ncc-army)]/10",
+  },
+  PROFILE: {
+    label: "Profile",
+    color: "text-[color:var(--ncc-gold)]",
+    bg: "bg-[color:var(--ncc-gold)]/10",
+  },
+  APPLICATION: {
+    label: "Application",
+    color: "text-[color:var(--ncc-maroon)]",
+    bg: "bg-[color:var(--ncc-maroon)]/10",
+  },
+  MENTOR: { label: "Mentor", color: "text-primary", bg: "bg-primary/10" },
+  GENERAL: { label: "General", color: "text-muted-foreground", bg: "bg-muted" },
 };
 
 function timeAgo(iso) {
@@ -137,16 +163,22 @@ function NotificationCard({ item }) {
   const meta = NOTIF_META[item.type] || NOTIF_META.GENERAL;
   const isUnread = item.isRead === false; // Fallback if isRead is missing
   return (
-    <div className={`card-soft p-4 flex flex-col gap-3 relative ${isUnread ? "ring-1 ring-primary/20" : ""}`}>
+    <div
+      className={`card-soft p-4 flex flex-col gap-3 relative ${isUnread ? "ring-1 ring-primary/20" : ""}`}
+    >
       {isUnread && (
         <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-primary animate-pulse" />
       )}
-      <div className={`self-start text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
+      <div
+        className={`self-start text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}
+      >
         {meta.label}
       </div>
       <p className="text-sm font-semibold leading-snug">{item.title}</p>
       {item.Descripton && (
-        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{item.Descripton}</p>
+        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+          {item.Descripton}
+        </p>
       )}
       <div className="mt-auto flex items-center gap-1 text-xs text-muted-foreground">
         <Clock className="h-3 w-3" />
@@ -162,16 +194,17 @@ function SavedJobCard({ item }) {
   const { profile } = useProfile();
 
   const companyName = item.organization?.name || "TechCorp";
-  const logoUrl = item.jobImage || item.organization?.logo ||
+  const logoUrl =
+    item.jobImage ||
+    item.organization?.logo ||
     `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(companyName)}&backgroundColor=800000`;
 
   // Dynamic match logic
   const userSkills = (profile?.skills || []).map((s) => s.toLowerCase());
   const jobSkills = item.skills || [];
   const matched = jobSkills.filter((s) => userSkills.includes(s.toLowerCase()));
-  const baseMatch = jobSkills.length > 0
-    ? Math.round((matched.length / jobSkills.length) * 100)
-    : 80;
+  const baseMatch =
+    jobSkills.length > 0 ? Math.round((matched.length / jobSkills.length) * 100) : 80;
   const hasNcc = !!profile?.nccUnit || !!profile?.enrolmentNumber;
   const matchPercent = Math.min(100, baseMatch + (hasNcc ? 12 : 0));
 
@@ -199,7 +232,10 @@ function SavedJobCard({ item }) {
 
       <div className="flex flex-wrap gap-1.5">
         {(item.skills || []).slice(0, 3).map((s) => (
-          <span key={s} className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-muted border border-border/60">
+          <span
+            key={s}
+            className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-muted border border-border/60"
+          >
             {s}
           </span>
         ))}
@@ -216,16 +252,31 @@ function SavedJobCard({ item }) {
       <div>
         <div className="flex items-center justify-between text-xs mb-1">
           <span className="text-muted-foreground">Match</span>
-          <span className="font-bold" style={{
-            color: matchPercent >= 85 ? "var(--ncc-army)" : matchPercent >= 70 ? "var(--ncc-gold)" : "var(--ncc-maroon)"
-          }}>{matchPercent}%</span>
+          <span
+            className="font-bold"
+            style={{
+              color:
+                matchPercent >= 85
+                  ? "var(--ncc-army)"
+                  : matchPercent >= 70
+                    ? "var(--ncc-gold)"
+                    : "var(--ncc-maroon)",
+            }}
+          >
+            {matchPercent}%
+          </span>
         </div>
         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
           <div
             className="h-full rounded-full transition-all"
             style={{
               width: `${matchPercent}%`,
-              background: matchPercent >= 85 ? "var(--ncc-army)" : matchPercent >= 70 ? "var(--ncc-gold)" : "var(--ncc-maroon)",
+              background:
+                matchPercent >= 85
+                  ? "var(--ncc-army)"
+                  : matchPercent >= 70
+                    ? "var(--ncc-gold)"
+                    : "var(--ncc-maroon)",
             }}
           />
         </div>
@@ -244,9 +295,12 @@ function SavedJobCard({ item }) {
 // ─── Mentor card ──────────────────────────────────────────────────────────────
 function MentorCard({ item, onConnect }) {
   const isAvailable = item.available !== false;
-  const orgName = typeof item.organization === "object" ? item.organization?.name : item.organization;
+  const orgName =
+    typeof item.organization === "object" ? item.organization?.name : item.organization;
   const specialties = item.expertise || ["Leadership", "Career Guidance"];
-  const avatarUrl = item.profileImage || `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(item.fullName || "Mentor")}&backgroundColor=800000`;
+  const avatarUrl =
+    item.profileImage ||
+    `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(item.fullName || "Mentor")}&backgroundColor=800000`;
 
   return (
     <div className="card-soft p-4 flex flex-col gap-3">
@@ -268,7 +322,9 @@ function MentorCard({ item, onConnect }) {
         </div>
         <div className="min-w-0">
           <p className="font-semibold text-sm truncate">{item.fullName}</p>
-          <p className="text-xs text-muted-foreground truncate">{item.designation || "NCC Mentor & Advisor"}</p>
+          <p className="text-xs text-muted-foreground truncate">
+            {item.designation || "NCC Mentor & Advisor"}
+          </p>
           {orgName && (
             <p className="text-[10px] text-muted-foreground/70 truncate flex items-center gap-1">
               <Building2 className="h-3 w-3 shrink-0" /> {orgName}
@@ -279,15 +335,20 @@ function MentorCard({ item, onConnect }) {
 
       <div className="flex flex-wrap gap-1.5">
         {specialties.slice(0, 3).map((e) => (
-          <span key={e} className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-primary/8 text-primary border border-primary/20">
+          <span
+            key={e}
+            className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-primary/8 text-primary border border-primary/20"
+          >
             {e}
           </span>
         ))}
       </div>
 
-      <div className={`text-[10px] font-semibold flex items-center gap-1 ${
-        isAvailable ? "text-green-600" : "text-muted-foreground"
-      }`}>
+      <div
+        className={`text-[10px] font-semibold flex items-center gap-1 ${
+          isAvailable ? "text-green-600" : "text-muted-foreground"
+        }`}
+      >
         <BadgeCheck className="h-3 w-3" />
         {isAvailable ? "Available for sessions" : "Currently unavailable"}
       </div>
@@ -338,7 +399,7 @@ export default function Dashboard() {
   const realSavedJobs = (savedJobs || []).map((item) => item.job).filter(Boolean);
   // fallback: if none saved, show top 6 public jobs
   const displaySaved = realSavedJobs.length ? realSavedJobs : jobs.slice(0, 6);
-  
+
   const displayNotifications = personalNotifications || [];
   const unreadCount = displayNotifications.filter((n) => n.isRead === false).length;
 
@@ -364,7 +425,8 @@ export default function Dashboard() {
     <DashboardLayout>
       {/* ── Hero Banner ── */}
       <motion.div
-        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
         className="rounded-3xl hero-gradient text-white p-7 sm:p-10 relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(201,162,39,0.35),transparent_45%)]" />
@@ -377,10 +439,16 @@ export default function Dashboard() {
             You have <strong>{unreadCount} unread notifications</strong> and new jobs waiting.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link to="/jobs" className="rounded-full bg-white text-[color:var(--ncc-maroon)] px-5 py-2 font-semibold text-sm">
+            <Link
+              to="/jobs"
+              className="rounded-full bg-white text-[color:var(--ncc-maroon)] px-5 py-2 font-semibold text-sm"
+            >
               Browse jobs
             </Link>
-            <Link to="/profile" className="rounded-full bg-white/10 hover:bg-white/15 px-5 py-2 font-semibold text-sm backdrop-blur">
+            <Link
+              to="/profile"
+              className="rounded-full bg-white/10 hover:bg-white/15 px-5 py-2 font-semibold text-sm backdrop-blur"
+            >
               Complete profile
             </Link>
           </div>
@@ -391,7 +459,8 @@ export default function Dashboard() {
           SECTION 1 — NOTIFICATIONS
       ═══════════════════════════════════════════ */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="mt-8 card-soft p-6"
       >
@@ -422,7 +491,8 @@ export default function Dashboard() {
           SECTION 2 — SAVED JOBS
       ═══════════════════════════════════════════ */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.16 }}
         className="mt-6 card-soft p-6"
       >
@@ -450,7 +520,8 @@ export default function Dashboard() {
           SECTION 3 — MENTOR CONNECT
       ═══════════════════════════════════════════ */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.22 }}
         className="mt-6 card-soft p-6"
       >
@@ -489,14 +560,18 @@ export default function Dashboard() {
             className="w-full max-w-md bg-card border border-border p-6 rounded-3xl shadow-xl flex flex-col gap-4 text-left font-sans"
           >
             <div>
-              <h3 className="text-lg font-bold text-foreground">Connect with {selectedMentor.fullName}</h3>
+              <h3 className="text-lg font-bold text-foreground">
+                Connect with {selectedMentor.fullName}
+              </h3>
               <p className="text-xs text-muted-foreground mt-1 font-sans">
                 Send a personalized request message to request mentorship.
               </p>
             </div>
-            
+
             <div className="flex flex-col gap-1.5 font-sans">
-              <label className="text-xs font-semibold text-muted-foreground font-sans">Mentorship Note</label>
+              <label className="text-xs font-semibold text-muted-foreground font-sans">
+                Mentorship Note
+              </label>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -504,7 +579,7 @@ export default function Dashboard() {
                 className="w-full h-24 p-3 rounded-2xl border border-border bg-muted/30 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none font-sans text-foreground"
               />
             </div>
-            
+
             <div className="flex justify-end gap-2.5 mt-2 font-sans">
               <button
                 onClick={() => setSelectedMentor(null)}

@@ -19,24 +19,50 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold mb-3">Product</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/jobs" className="hover:text-primary">Jobs</Link></li>
-            <li><Link to="/dashboard" className="hover:text-primary">Dashboard</Link></li>
-            <li><Link to="/profile" className="hover:text-primary">Profile</Link></li>
+            <li>
+              <Link to="/jobs" className="hover:text-primary">
+                Jobs
+              </Link>
+            </li>
+            <li>
+              <Link to="/dashboard" className="hover:text-primary">
+                Dashboard
+              </Link>
+            </li>
+            <li>
+              <Link to="/profile" className="hover:text-primary">
+                Profile
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
           <h4 className="font-semibold mb-3">Company</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/about" className="hover:text-primary">About</Link></li>
-            <li><Link to="/contact" className="hover:text-primary">Contact</Link></li>
+            <li>
+              <Link to="/about" className="hover:text-primary">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact" className="hover:text-primary">
+                Contact
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
           <h4 className="font-semibold mb-3">Follow</h4>
           <div className="flex gap-3 text-muted-foreground">
-            <a href="#" aria-label="Twitter" className="hover:text-primary"><Twitter className="h-5 w-5"/></a>
-            <a href="#" aria-label="LinkedIn" className="hover:text-primary"><Linkedin className="h-5 w-5"/></a>
-            <a href="#" aria-label="GitHub" className="hover:text-primary"><Github className="h-5 w-5"/></a>
+            <a href="#" aria-label="Twitter" className="hover:text-primary">
+              <Twitter className="h-5 w-5" />
+            </a>
+            <a href="#" aria-label="LinkedIn" className="hover:text-primary">
+              <Linkedin className="h-5 w-5" />
+            </a>
+            <a href="#" aria-label="GitHub" className="hover:text-primary">
+              <Github className="h-5 w-5" />
+            </a>
           </div>
         </div>
       </div>

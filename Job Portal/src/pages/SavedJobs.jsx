@@ -18,7 +18,9 @@ export default function SavedJobs() {
   return (
     <DashboardLayout>
       <h1 className="text-2xl sm:text-3xl font-display font-extrabold">Saved jobs</h1>
-      <p className="text-sm text-muted-foreground mt-1">Jobs you've bookmarked, all in one place.</p>
+      <p className="text-sm text-muted-foreground mt-1">
+        Jobs you've bookmarked, all in one place.
+      </p>
 
       <div className="mt-6">
         {loading && jobsList.length === 0 ? (

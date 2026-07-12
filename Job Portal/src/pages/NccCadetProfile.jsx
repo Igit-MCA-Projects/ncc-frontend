@@ -4,9 +4,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Shield, Award, Star,
-  Hash, Flag, Trophy, User, Edit2,
-  Loader2, X, AlertCircle, Plus, Upload, CheckCircle2, Image,
+  Shield,
+  Award,
+  Star,
+  Hash,
+  Flag,
+  Trophy,
+  User,
+  Edit2,
+  Loader2,
+  X,
+  AlertCircle,
+  Plus,
+  Upload,
+  CheckCircle2,
+  Image,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -48,7 +60,8 @@ function F({ label, children, required = false }) {
   return (
     <label className="block">
       <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        {label}{required && <span className="text-destructive ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </span>
       {children}
     </label>
@@ -65,18 +78,48 @@ function FieldError({ errors, name }) {
 ───────────────────────────────────────────── */
 // photo + aadhar are handled by dedicated upload widgets (not in this list)
 const CREATE_FIELDS = [
-  { name: "fullName",       label: "Full Name",          required: true,  placeholder: "Bibek Samal" },
-  { name: "FatherFullName", label: "Father's Full Name", required: true,  placeholder: "Ramesh Chandra Samal" },
-  { name: "MotherFullName", label: "Mother's Full Name", required: true,  placeholder: "Sunita Samal" },
-  { name: "dateOfBirth",    label: "Date of Birth",      required: true,  type: "date" },
-  { name: "aadharNo",       label: "Aadhaar Number",     required: false, placeholder: "1234 1234 1234" },
-  { name: "nccDirector",    label: "NCC Directorate",    required: true,  placeholder: "Odisha Directorate" },
-  { name: "nccGroupHQ",     label: "NCC Group HQ",       required: true,  placeholder: "Cuttack Group HQ" },
-  { name: "enrolmentNumber",label: "Enrolment Number",   required: true,  placeholder: "OD/SD/2024/001234" },
-  { name: "nccBattalion",   label: "NCC Battalion",      required: true,  placeholder: "12 Odisha Battalion NCC" },
-  { name: "nccUnit",        label: "NCC Unit",           required: true,  placeholder: "B Company" },
-  { name: "nccCirtificate", label: "NCC Certificate",    required: false, placeholder: "B Certificate" },
-  { name: "nccRank",        label: "NCC Rank",           required: false, placeholder: "Sergeant" },
+  { name: "fullName", label: "Full Name", required: true, placeholder: "Bibek Samal" },
+  {
+    name: "FatherFullName",
+    label: "Father's Full Name",
+    required: true,
+    placeholder: "Ramesh Chandra Samal",
+  },
+  {
+    name: "MotherFullName",
+    label: "Mother's Full Name",
+    required: true,
+    placeholder: "Sunita Samal",
+  },
+  { name: "dateOfBirth", label: "Date of Birth", required: true, type: "date" },
+  { name: "aadharNo", label: "Aadhaar Number", required: false, placeholder: "1234 1234 1234" },
+  {
+    name: "nccDirector",
+    label: "NCC Directorate",
+    required: true,
+    placeholder: "Odisha Directorate",
+  },
+  { name: "nccGroupHQ", label: "NCC Group HQ", required: true, placeholder: "Cuttack Group HQ" },
+  {
+    name: "enrolmentNumber",
+    label: "Enrolment Number",
+    required: true,
+    placeholder: "OD/SD/2024/001234",
+  },
+  {
+    name: "nccBattalion",
+    label: "NCC Battalion",
+    required: true,
+    placeholder: "12 Odisha Battalion NCC",
+  },
+  { name: "nccUnit", label: "NCC Unit", required: true, placeholder: "B Company" },
+  {
+    name: "nccCirtificate",
+    label: "NCC Certificate",
+    required: false,
+    placeholder: "B Certificate",
+  },
+  { name: "nccRank", label: "NCC Rank", required: false, placeholder: "Sergeant" },
 ];
 
 /* ─────────────────────────────────────────────
@@ -108,18 +151,18 @@ async function uploadFile(file, { onUrl, setUploading, setUploaded, label = "Fil
 ───────────────────────────────────────────── */
 function PhotoUploadField({ register, setValue, errors, defaultPreview = "" }) {
   // fileName kept in its own state — never cleared when browser resets the native <input>
-  const [fileName, setFileName]       = useState("");
-  const [fileRef, setFileRef]         = useState(null);
-  const [uploading, setUploading]     = useState(false);
-  const [uploaded, setUploaded]       = useState(!!defaultPreview);
-  const [preview, setPreview]         = useState(defaultPreview);
+  const [fileName, setFileName] = useState("");
+  const [fileRef, setFileRef] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploaded, setUploaded] = useState(!!defaultPreview);
+  const [preview, setPreview] = useState(defaultPreview);
   const [uploadedUrl, setUploadedUrl] = useState(defaultPreview);
 
   const handleFileChange = (e) => {
     const f = e.target.files?.[0] || null;
     if (!f) return;
     setFileRef(f);
-    setFileName(f.name);   // persist filename in state
+    setFileName(f.name); // persist filename in state
     setUploaded(false);
     setUploadedUrl("");
     setValue("photo", "");
@@ -129,7 +172,11 @@ function PhotoUploadField({ register, setValue, errors, defaultPreview = "" }) {
   const handleUpload = () =>
     uploadFile(fileRef, {
       label: "Photo",
-      onUrl: (url) => { setValue("photo", url); setPreview(url); setUploadedUrl(url); },
+      onUrl: (url) => {
+        setValue("photo", url);
+        setPreview(url);
+        setUploadedUrl(url);
+      },
       setUploading,
       setUploaded,
     });
@@ -143,21 +190,37 @@ function PhotoUploadField({ register, setValue, errors, defaultPreview = "" }) {
       <div className="flex items-start gap-4">
         {/* Thumbnail preview */}
         <div className="h-20 w-20 rounded-2xl border border-border bg-muted/40 overflow-hidden shrink-0 flex items-center justify-center">
-          {preview
-            ? <img src={preview} alt="Preview" className="h-full w-full object-cover"
-                onError={(e) => { e.target.style.display = "none"; }} />
-            : <Image className="h-8 w-8 text-muted-foreground/50" />}
+          {preview ? (
+            <img
+              src={preview}
+              alt="Preview"
+              className="h-full w-full object-cover"
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
+            />
+          ) : (
+            <Image className="h-8 w-8 text-muted-foreground/50" />
+          )}
         </div>
 
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2">
             <label className="flex-1 cursor-pointer">
-              <div className={`h-11 px-3 rounded-xl bg-card border text-sm flex items-center gap-2 overflow-hidden ${
-                uploaded ? "border-green-500/60" : errors?.photo ? "border-destructive" : "border-border"
-              }`}>
-                {uploaded
-                  ? <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
-                  : <Upload className="h-4 w-4 text-muted-foreground shrink-0" />}
+              <div
+                className={`h-11 px-3 rounded-xl bg-card border text-sm flex items-center gap-2 overflow-hidden ${
+                  uploaded
+                    ? "border-green-500/60"
+                    : errors?.photo
+                      ? "border-destructive"
+                      : "border-border"
+                }`}
+              >
+                {uploaded ? (
+                  <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                ) : (
+                  <Upload className="h-4 w-4 text-muted-foreground shrink-0" />
+                )}
                 <span className="truncate text-muted-foreground text-sm">
                   {fileName || "Choose image file…"}
                 </span>
@@ -165,13 +228,25 @@ function PhotoUploadField({ register, setValue, errors, defaultPreview = "" }) {
               <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
             </label>
 
-            <button type="button" disabled={!fileRef || uploading || uploaded} onClick={handleUpload}
-              className="btn-primary text-sm px-3 h-11 shrink-0 disabled:opacity-40 flex items-center gap-1.5">
-              {uploading
-                ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading…</>
-                : uploaded
-                ? <><CheckCircle2 className="h-4 w-4" /> Uploaded</>
-                : <><Upload className="h-4 w-4" /> Upload</>}
+            <button
+              type="button"
+              disabled={!fileRef || uploading || uploaded}
+              onClick={handleUpload}
+              className="btn-primary text-sm px-3 h-11 shrink-0 disabled:opacity-40 flex items-center gap-1.5"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
+                </>
+              ) : uploaded ? (
+                <>
+                  <CheckCircle2 className="h-4 w-4" /> Uploaded
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4" /> Upload
+                </>
+              )}
             </button>
           </div>
 
@@ -179,8 +254,14 @@ function PhotoUploadField({ register, setValue, errors, defaultPreview = "" }) {
           {uploadedUrl && (
             <div className="flex items-center gap-1.5 text-xs text-green-600">
               <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-              <a href={uploadedUrl} target="_blank" rel="noopener noreferrer"
-                className="truncate hover:underline font-medium">{uploadedUrl}</a>
+              <a
+                href={uploadedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="truncate hover:underline font-medium"
+              >
+                {uploadedUrl}
+              </a>
             </div>
           )}
         </div>
@@ -196,10 +277,10 @@ function PhotoUploadField({ register, setValue, errors, defaultPreview = "" }) {
    AADHAAR DOCUMENT UPLOAD FIELD
 ───────────────────────────────────────────── */
 function AadharUploadField({ register, setValue, defaultUrl = "" }) {
-  const [fileName, setFileName]       = useState("");
-  const [fileRef, setFileRef]         = useState(null);
-  const [uploading, setUploading]     = useState(false);
-  const [uploaded, setUploaded]       = useState(!!defaultUrl);
+  const [fileName, setFileName] = useState("");
+  const [fileRef, setFileRef] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploaded, setUploaded] = useState(!!defaultUrl);
   const [uploadedUrl, setUploadedUrl] = useState(defaultUrl);
 
   const handleFileChange = (e) => {
@@ -215,7 +296,10 @@ function AadharUploadField({ register, setValue, defaultUrl = "" }) {
   const handleUpload = () =>
     uploadFile(fileRef, {
       label: "Aadhaar document",
-      onUrl: (url) => { setValue("aadhar", url); setUploadedUrl(url); },
+      onUrl: (url) => {
+        setValue("aadhar", url);
+        setUploadedUrl(url);
+      },
       setUploading,
       setUploaded,
     });
@@ -228,27 +312,47 @@ function AadharUploadField({ register, setValue, defaultUrl = "" }) {
 
       <div className="flex items-center gap-2">
         <label className="flex-1 cursor-pointer">
-          <div className={`h-11 px-3 rounded-xl bg-card border text-sm flex items-center gap-2 overflow-hidden ${
-            uploaded ? "border-green-500/60" : "border-border"
-          }`}>
-            {uploaded
-              ? <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
-              : <Upload className="h-4 w-4 text-muted-foreground shrink-0" />}
+          <div
+            className={`h-11 px-3 rounded-xl bg-card border text-sm flex items-center gap-2 overflow-hidden ${
+              uploaded ? "border-green-500/60" : "border-border"
+            }`}
+          >
+            {uploaded ? (
+              <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+            ) : (
+              <Upload className="h-4 w-4 text-muted-foreground shrink-0" />
+            )}
             <span className="truncate text-muted-foreground text-sm">
               {fileName || "Choose PDF / image file…"}
             </span>
           </div>
-          <input type="file" accept=".pdf,image/*,application/pdf" className="hidden"
-            onChange={handleFileChange} />
+          <input
+            type="file"
+            accept=".pdf,image/*,application/pdf"
+            className="hidden"
+            onChange={handleFileChange}
+          />
         </label>
 
-        <button type="button" disabled={!fileRef || uploading || uploaded} onClick={handleUpload}
-          className="btn-primary text-sm px-3 h-11 shrink-0 disabled:opacity-40 flex items-center gap-1.5">
-          {uploading
-            ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading…</>
-            : uploaded
-            ? <><CheckCircle2 className="h-4 w-4" /> Uploaded</>
-            : <><Upload className="h-4 w-4" /> Upload</>}
+        <button
+          type="button"
+          disabled={!fileRef || uploading || uploaded}
+          onClick={handleUpload}
+          className="btn-primary text-sm px-3 h-11 shrink-0 disabled:opacity-40 flex items-center gap-1.5"
+        >
+          {uploading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
+            </>
+          ) : uploaded ? (
+            <>
+              <CheckCircle2 className="h-4 w-4" /> Uploaded
+            </>
+          ) : (
+            <>
+              <Upload className="h-4 w-4" /> Upload
+            </>
+          )}
         </button>
       </div>
 
@@ -256,8 +360,14 @@ function AadharUploadField({ register, setValue, defaultUrl = "" }) {
       {uploadedUrl && (
         <div className="mt-1.5 flex items-center gap-1.5 text-xs text-green-600">
           <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-          <a href={uploadedUrl} target="_blank" rel="noopener noreferrer"
-            className="truncate hover:underline font-medium">{uploadedUrl}</a>
+          <a
+            href={uploadedUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="truncate hover:underline font-medium"
+          >
+            {uploadedUrl}
+          </a>
         </div>
       )}
 
@@ -281,10 +391,20 @@ function CreateNccProfileForm() {
   } = useForm({
     resolver: zodResolver(nccProfileSchema),
     defaultValues: {
-      fullName: "", FatherFullName: "", MotherFullName: "", photo: "",
-      dateOfBirth: "", aadharNo: "", aadhar: "", nccDirector: "",
-      nccGroupHQ: "", enrolmentNumber: "", nccBattalion: "",
-      nccUnit: "", nccCirtificate: "", nccRank: "",
+      fullName: "",
+      FatherFullName: "",
+      MotherFullName: "",
+      photo: "",
+      dateOfBirth: "",
+      aadharNo: "",
+      aadhar: "",
+      nccDirector: "",
+      nccGroupHQ: "",
+      enrolmentNumber: "",
+      nccBattalion: "",
+      nccUnit: "",
+      nccCirtificate: "",
+      nccRank: "",
     },
   });
 
@@ -362,9 +482,15 @@ function CreateNccProfileForm() {
               disabled={submitting}
               className="btn-primary text-sm inline-flex items-center gap-2 min-w-[160px] justify-center"
             >
-              {submitting
-                ? <><Loader2 className="h-4 w-4 animate-spin" /> Creating…</>
-                : <><Shield className="h-4 w-4" /> Create NCC Profile</>}
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Creating…
+                </>
+              ) : (
+                <>
+                  <Shield className="h-4 w-4" /> Create NCC Profile
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -407,7 +533,7 @@ function UpdateNccProfileModal({ profile, onClose }) {
 
   const onSubmit = async (data) => {
     const payload = Object.fromEntries(
-      Object.entries(data).filter(([, v]) => v !== "" && v !== undefined)
+      Object.entries(data).filter(([, v]) => v !== "" && v !== undefined),
     );
     setSubmitting(true);
     try {
@@ -447,8 +573,10 @@ function UpdateNccProfileModal({ profile, onClose }) {
                 Change only the fields you want to update.
               </p>
             </div>
-            <button onClick={onClose}
-              className="h-8 w-8 rounded-xl border border-border flex items-center justify-center hover:bg-muted transition-colors">
+            <button
+              onClick={onClose}
+              className="h-8 w-8 rounded-xl border border-border flex items-center justify-center hover:bg-muted transition-colors"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -490,11 +618,20 @@ function UpdateNccProfileModal({ profile, onClose }) {
               <button type="button" onClick={onClose} className="btn-outline text-sm">
                 Cancel
               </button>
-              <button type="submit" disabled={submitting}
-                className="btn-primary text-sm inline-flex items-center gap-2 min-w-[140px] justify-center">
-                {submitting
-                  ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>
-                  : <><Edit2 className="h-4 w-4" /> Save Changes</>}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="btn-primary text-sm inline-flex items-center gap-2 min-w-[140px] justify-center"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> Saving…
+                  </>
+                ) : (
+                  <>
+                    <Edit2 className="h-4 w-4" /> Save Changes
+                  </>
+                )}
               </button>
             </div>
           </form>
@@ -549,7 +686,9 @@ function NccProfileView({ profile }) {
     if (!dateStr) return null;
     try {
       return new Date(dateStr).toLocaleDateString("en-IN", {
-        day: "numeric", month: "long", year: "numeric",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
       });
     } catch {
       return dateStr;
@@ -571,7 +710,9 @@ function NccProfileView({ profile }) {
             <img
               src={profile.photo}
               alt={profile.fullName}
-              onError={(e) => { e.target.style.display = "none"; }}
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
               className="h-20 w-20 rounded-2xl ring-4 ring-white/30 object-cover shrink-0"
             />
           ) : (
@@ -619,9 +760,13 @@ function NccProfileView({ profile }) {
 
       {/* ── Profile Data ── */}
       <div className="grid lg:grid-cols-2 gap-6">
-
         {/* NCC Service Details */}
-        <Section icon={Shield} iconColor="var(--ncc-maroon)" title="NCC Service Details" delay={0.05}>
+        <Section
+          icon={Shield}
+          iconColor="var(--ncc-maroon)"
+          title="NCC Service Details"
+          delay={0.05}
+        >
           <Row label="Full Name" value={profile.fullName} />
           <Row label="Date of Birth" value={formatDate(profile.dateOfBirth)} />
           <Row label="Father's Name" value={profile.FatherFullName} />
@@ -645,7 +790,9 @@ function NccProfileView({ profile }) {
             <Row label="Aadhaar Number" value={profile.aadharNo} />
             {profile.aadhar && (
               <div className="flex items-start justify-between gap-4 py-3 border-b border-border/60 last:border-0">
-                <span className="text-sm text-muted-foreground shrink-0 w-44">Aadhaar Document</span>
+                <span className="text-sm text-muted-foreground shrink-0 w-44">
+                  Aadhaar Document
+                </span>
                 <a
                   href={profile.aadhar}
                   target="_blank"
@@ -662,10 +809,7 @@ function NccProfileView({ profile }) {
 
       {/* Update Modal */}
       {showUpdate && (
-        <UpdateNccProfileModal
-          profile={profile}
-          onClose={() => setShowUpdate(false)}
-        />
+        <UpdateNccProfileModal profile={profile} onClose={() => setShowUpdate(false)} />
       )}
     </DashboardLayout>
   );

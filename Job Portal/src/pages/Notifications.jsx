@@ -1,15 +1,52 @@
 import { useEffect, useState, useMemo } from "react";
-import { Bell, Search, Info, ChevronLeft, ChevronRight, RefreshCw, Sparkles, Award, Briefcase, Users, Calendar } from "lucide-react";
+import {
+  Bell,
+  Search,
+  Info,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+  Sparkles,
+  Award,
+  Briefcase,
+  Users,
+  Calendar,
+} from "lucide-react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { useNotificationContext } from "../context/NotificationContext";
 import toast from "react-hot-toast";
 
 const NOTIF_META = {
-  JOB_MATCH:   { label: "Job Match",   color: "text-[color:var(--ncc-army)]",   bg: "bg-[color:var(--ncc-army)]/10 border-[color:var(--ncc-army)]/20", icon: Sparkles },
-  PROFILE:     { label: "Profile",     color: "text-[color:var(--ncc-gold)]",   bg: "bg-[color:var(--ncc-gold)]/10 border-[color:var(--ncc-gold)]/20", icon: Award },
-  APPLICATION: { label: "Application", color: "text-[color:var(--ncc-maroon)]", bg: "bg-[color:var(--ncc-maroon)]/10 border-[color:var(--ncc-maroon)]/20", icon: Briefcase },
-  MENTOR:      { label: "Mentor",      color: "text-primary",                   bg: "bg-primary/10 border-primary/20", icon: Users },
-  GENERAL:     { label: "General",     color: "text-muted-foreground",          bg: "bg-muted border-border/80", icon: Info },
+  JOB_MATCH: {
+    label: "Job Match",
+    color: "text-[color:var(--ncc-army)]",
+    bg: "bg-[color:var(--ncc-army)]/10 border-[color:var(--ncc-army)]/20",
+    icon: Sparkles,
+  },
+  PROFILE: {
+    label: "Profile",
+    color: "text-[color:var(--ncc-gold)]",
+    bg: "bg-[color:var(--ncc-gold)]/10 border-[color:var(--ncc-gold)]/20",
+    icon: Award,
+  },
+  APPLICATION: {
+    label: "Application",
+    color: "text-[color:var(--ncc-maroon)]",
+    bg: "bg-[color:var(--ncc-maroon)]/10 border-[color:var(--ncc-maroon)]/20",
+    icon: Briefcase,
+  },
+  MENTOR: {
+    label: "Mentor",
+    color: "text-primary",
+    bg: "bg-primary/10 border-primary/20",
+    icon: Users,
+  },
+  GENERAL: {
+    label: "General",
+    color: "text-muted-foreground",
+    bg: "bg-muted border-border/80",
+    icon: Info,
+  },
 };
 
 function formatDate(isoString) {
@@ -168,7 +205,8 @@ export default function Notifications() {
                 <tr>
                   <td colSpan="4" className="p-10 text-center text-muted-foreground">
                     <div className="flex justify-center items-center gap-2">
-                      <RefreshCw className="h-5 w-5 animate-spin text-primary" /> Loading notifications...
+                      <RefreshCw className="h-5 w-5 animate-spin text-primary" /> Loading
+                      notifications...
                     </div>
                   </td>
                 </tr>
@@ -185,7 +223,9 @@ export default function Notifications() {
                   return (
                     <tr key={item.id} className="hover:bg-muted/30 transition-colors">
                       <td className="p-4 sm:p-5 text-center">
-                        <div className={`h-8 w-8 rounded-full border grid place-items-center mx-auto ${meta.bg} ${meta.color}`}>
+                        <div
+                          className={`h-8 w-8 rounded-full border grid place-items-center mx-auto ${meta.bg} ${meta.color}`}
+                        >
                           <Icon className="h-4 w-4" />
                         </div>
                       </td>
@@ -193,7 +233,9 @@ export default function Notifications() {
                         <div>
                           {item.title}
                           {activeTab === "personal" && (
-                            <span className={`ml-2 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
+                            <span
+                              className={`ml-2 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-full ${meta.bg} ${meta.color}`}
+                            >
                               {meta.label}
                             </span>
                           )}
@@ -201,7 +243,9 @@ export default function Notifications() {
                       </td>
                       <td className="p-4 sm:p-5 text-muted-foreground leading-relaxed whitespace-pre-line">
                         {item.Descripton || (
-                          <span className="text-xs italic text-muted-foreground/60">No additional details provided</span>
+                          <span className="text-xs italic text-muted-foreground/60">
+                            No additional details provided
+                          </span>
                         )}
                       </td>
                       <td className="p-4 sm:p-5 text-muted-foreground font-medium">
@@ -222,7 +266,8 @@ export default function Notifications() {
         {!loading && filteredItems.length > 0 && (
           <div className="p-4 bg-muted/20 border-t border-border flex items-center justify-between text-sm">
             <span className="text-muted-foreground">
-              Showing <strong className="text-foreground">{(currentPage - 1) * itemsPerPage + 1}</strong> to{" "}
+              Showing{" "}
+              <strong className="text-foreground">{(currentPage - 1) * itemsPerPage + 1}</strong> to{" "}
               <strong className="text-foreground">
                 {Math.min(currentPage * itemsPerPage, filteredItems.length)}
               </strong>{" "}

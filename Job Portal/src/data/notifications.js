@@ -18,7 +18,8 @@ const notifications = [
   {
     id: "n3",
     title: "Application viewed by BharatShield Systems",
-    Descripton: "A recruiter from BharatShield Systems viewed your profile for the Defense Analyst role.",
+    Descripton:
+      "A recruiter from BharatShield Systems viewed your profile for the Defense Analyst role.",
     type: "APPLICATION",
     isRead: true,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
@@ -26,7 +27,8 @@ const notifications = [
   {
     id: "n4",
     title: "NCC Certificate boost applied",
-    Descripton: "Your NCC C Certificate has been verified. You now get a +12% match bonus on leadership roles.",
+    Descripton:
+      "Your NCC C Certificate has been verified. You now get a +12% match bonus on leadership roles.",
     type: "GENERAL",
     isRead: true,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 96).toISOString(),

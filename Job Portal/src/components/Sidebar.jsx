@@ -1,17 +1,30 @@
 import { Link, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Briefcase, Bookmark, User, Settings, LogOut, Shield, X, Bot, ShieldCheck,
-  Calendar, GraduationCap, Bell, Users,
+  LayoutDashboard,
+  Briefcase,
+  Bookmark,
+  User,
+  Settings,
+  LogOut,
+  Shield,
+  X,
+  Bot,
+  ShieldCheck,
+  Calendar,
+  GraduationCap,
+  Bell,
+  Users,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
-
 
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/profile", label: "Profile", icon: User },
   { to: "/ncc-profile", label: "NCC Profile", icon: ShieldCheck },
   { to: "/career-assistant", label: "Career Assistant", icon: Bot },
+  { to: "/resume-builder", label: "Resume Builder", icon: FileText },
   { to: "/mentorship-status", label: "Mentorship Status", icon: Users },
   { to: "/jobs", label: "Jobs", icon: Briefcase },
   { to: "/saved-jobs", label: "Saved Jobs", icon: Bookmark },
@@ -21,8 +34,6 @@ const items = [
   { to: "/notifications", label: "Notifications", icon: Bell },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
-
-
 
 export default function Sidebar({ open, onClose }) {
   const { logout } = useAuth();
@@ -36,9 +47,7 @@ export default function Sidebar({ open, onClose }) {
 
   return (
     <>
-      {open && (
-        <div className="fixed inset-0 z-30 bg-black/40 lg:hidden" onClick={onClose} />
-      )}
+      {open && <div className="fixed inset-0 z-30 bg-black/40 lg:hidden" onClick={onClose} />}
       <aside
         className={[
           "fixed lg:sticky top-0 z-40 lg:z-auto h-screen w-64 shrink-0 bg-card border-r border-border",
@@ -64,7 +73,7 @@ export default function Sidebar({ open, onClose }) {
               key={to}
               to={to}
               onClick={onClose}
-             
+
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-foreground/80 hover:bg-muted transition-colors"
             >
               <Icon className="h-4 w-4" />
@@ -75,7 +84,6 @@ export default function Sidebar({ open, onClose }) {
 
         {/* NCC Cadet Profile Card */}
         <div className="flex-1" />
-      
 
         <div className="p-3 border-t border-border shrink-0">
           <button

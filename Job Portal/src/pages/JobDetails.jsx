@@ -1,7 +1,16 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, MapPin, IndianRupee, Briefcase, Bookmark, Sparkles, Check, X } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  IndianRupee,
+  Briefcase,
+  Bookmark,
+  Sparkles,
+  Check,
+  X,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { useJobsContext } from "../context/JobsContext";
@@ -56,7 +65,9 @@ export default function JobDetails() {
 
   // ── Derive company name & logo ──────────────────────────────────────────────
   const companyName = job.organization?.name || "TechCorp";
-  const logoUrl = job.jobImage || job.organization?.logo ||
+  const logoUrl =
+    job.jobImage ||
+    job.organization?.logo ||
     `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(companyName)}&backgroundColor=800000`;
 
   // ── Dynamic Skills Matching ──────────────────────────────────────────────────
@@ -67,9 +78,8 @@ export default function JobDetails() {
   const missing = jobSkills.filter((s) => !userSkills.includes(s.toLowerCase()));
 
   // Base match calculation + NCC bonus
-  const baseMatch = jobSkills.length > 0
-    ? Math.round((matched.length / jobSkills.length) * 100)
-    : 80;
+  const baseMatch =
+    jobSkills.length > 0 ? Math.round((matched.length / jobSkills.length) * 100) : 80;
   const hasNcc = !!profile?.nccUnit || !!profile?.enrolmentNumber;
   const matchPercent = Math.min(100, baseMatch + (hasNcc ? 12 : 0));
 
@@ -77,7 +87,9 @@ export default function JobDetails() {
   const displayMissing = missing.length > 0 ? missing : ["None! Perfect fit"];
 
   const salaryText = job.ctc || job.stipend || "Not Disclosed";
-  const jobType = job.hirignType ? job.hirignType.charAt(0) + job.hirignType.slice(1).toLowerCase() : "Full-time";
+  const jobType = job.hirignType
+    ? job.hirignType.charAt(0) + job.hirignType.slice(1).toLowerCase()
+    : "Full-time";
   const locationText = job.Location || "Remote";
 
   // format dates
@@ -86,7 +98,10 @@ export default function JobDetails() {
 
   return (
     <DashboardLayout>
-      <Link to="/jobs" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-2">
+      <Link
+        to="/jobs"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-2"
+      >
         <ArrowLeft className="h-4 w-4" /> Back to jobs
       </Link>
 
@@ -101,7 +116,11 @@ export default function JobDetails() {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(201,162,39,0.4),transparent_45%)]" />
             </div>
             <div className="p-6 -mt-10">
-              <img src={logoUrl} alt={companyName} className="h-16 w-16 rounded-2xl ring-4 ring-card bg-card object-cover" />
+              <img
+                src={logoUrl}
+                alt={companyName}
+                className="h-16 w-16 rounded-2xl ring-4 ring-card bg-card object-cover"
+              />
               <h1 className="mt-3 text-2xl font-display font-extrabold">{job.title}</h1>
               <p className="text-muted-foreground">{companyName}</p>
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
@@ -119,10 +138,16 @@ export default function JobDetails() {
                 </span>
               </div>
               <div className="mt-5 flex gap-3">
-                <button onClick={handleApply} className="btn-primary py-2 px-5 font-semibold text-sm">
+                <button
+                  onClick={handleApply}
+                  className="btn-primary py-2 px-5 font-semibold text-sm"
+                >
                   Apply now
                 </button>
-                <button onClick={handleSave} className="btn-outline inline-flex items-center gap-2 py-2 px-4 text-sm font-semibold">
+                <button
+                  onClick={handleSave}
+                  className="btn-outline inline-flex items-center gap-2 py-2 px-4 text-sm font-semibold"
+                >
                   <Bookmark className={`h-4 w-4 ${saved ? "fill-primary text-primary" : ""}`} />
                   {saved ? "Saved" : "Save job"}
                 </button>
@@ -131,19 +156,25 @@ export default function JobDetails() {
           </div>
 
           <Section title="Job description">
-            <p className="text-muted-foreground whitespace-pre-line leading-relaxed">{job.description}</p>
+            <p className="text-muted-foreground whitespace-pre-line leading-relaxed">
+              {job.description}
+            </p>
           </Section>
 
           {startDateText && (
             <Section title="Hiring Dates">
               <div className="flex gap-6 max-w-sm">
                 <div>
-                  <div className="text-xs text-muted-foreground uppercase font-semibold">Start Date</div>
+                  <div className="text-xs text-muted-foreground uppercase font-semibold">
+                    Start Date
+                  </div>
                   <div className="font-semibold text-sm mt-1">{startDateText}</div>
                 </div>
                 {endDateText && (
                   <div>
-                    <div className="text-xs text-muted-foreground uppercase font-semibold">Apply End Date</div>
+                    <div className="text-xs text-muted-foreground uppercase font-semibold">
+                      Apply End Date
+                    </div>
                     <div className="font-semibold text-sm mt-1 text-destructive">{endDateText}</div>
                   </div>
                 )}
@@ -181,7 +212,9 @@ export default function JobDetails() {
               </div>
             </div>
             <div className="mt-5">
-              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Strengths</div>
+              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Strengths
+              </div>
               <ul className="mt-2 space-y-1 text-xs sm:text-sm">
                 {displayMatched.map((m) => (
                   <li key={m} className="flex items-center gap-2 text-green-600 font-medium">
@@ -192,11 +225,20 @@ export default function JobDetails() {
               </ul>
             </div>
             <div className="mt-4">
-              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Missing skills</div>
+              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Missing skills
+              </div>
               <ul className="mt-2 space-y-1 text-xs sm:text-sm">
                 {displayMissing.map((m) => (
-                  <li key={m} className={`flex items-center gap-2 font-medium ${missing.length > 0 ? "text-destructive" : "text-muted-foreground"}`}>
-                    {missing.length > 0 ? <X className="h-4 w-4 text-destructive shrink-0" /> : <Check className="h-4 w-4 text-green-500 shrink-0" />}
+                  <li
+                    key={m}
+                    className={`flex items-center gap-2 font-medium ${missing.length > 0 ? "text-destructive" : "text-muted-foreground"}`}
+                  >
+                    {missing.length > 0 ? (
+                      <X className="h-4 w-4 text-destructive shrink-0" />
+                    ) : (
+                      <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    )}
                     {m}
                   </li>
                 ))}
@@ -205,7 +247,8 @@ export default function JobDetails() {
             {job.description && (
               <div className="mt-5 rounded-xl bg-muted/60 p-3 text-xs sm:text-sm leading-relaxed">
                 <strong>Suggestion:</strong> Align your profile headlines and highlight{" "}
-                {missing.slice(0, 2).join(" & ") || "all required abilities"} to boost interview selector score.
+                {missing.slice(0, 2).join(" & ") || "all required abilities"} to boost interview
+                selector score.
               </div>
             )}
           </div>

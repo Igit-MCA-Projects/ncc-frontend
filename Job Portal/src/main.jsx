@@ -14,5 +14,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Toaster position="top-right" toastOptions={{ style: { borderRadius: "12px" } }} />
       </AuthProvider>
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

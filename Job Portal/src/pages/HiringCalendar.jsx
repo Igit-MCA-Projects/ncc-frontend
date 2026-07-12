@@ -1,5 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
-import { Calendar, Search, ExternalLink, GraduationCap, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import {
+  Calendar,
+  Search,
+  ExternalLink,
+  GraduationCap,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+} from "lucide-react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { getHiringCalendar } from "../services/publicApi";
 import toast from "react-hot-toast";
@@ -62,8 +70,19 @@ export default function HiringCalendar() {
 
   // Month list builder for selector dropdown
   const monthOptions = [
-    "All", "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "All",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   return (
@@ -106,7 +125,9 @@ export default function HiringCalendar() {
           >
             <option value="All">All Months (Calendar Year)</option>
             {monthOptions.slice(1).map((m) => (
-              <option key={m} value={m}>{m}</option>
+              <option key={m} value={m}>
+                {m}
+              </option>
             ))}
           </select>
         </div>
@@ -130,7 +151,8 @@ export default function HiringCalendar() {
                 <tr>
                   <td colSpan="5" className="p-10 text-center text-muted-foreground">
                     <div className="flex justify-center items-center gap-2">
-                      <RefreshCw className="h-5 w-5 animate-spin text-primary" /> Loading calendar...
+                      <RefreshCw className="h-5 w-5 animate-spin text-primary" /> Loading
+                      calendar...
                     </div>
                   </td>
                 </tr>
@@ -169,7 +191,10 @@ export default function HiringCalendar() {
                       <div className="flex flex-wrap gap-1.5">
                         {item.prepairResource?.length > 0 ? (
                           item.prepairResource.map((r, i) => (
-                            <span key={i} className="inline-flex items-center gap-0.5 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/8 text-primary border border-primary/20">
+                            <span
+                              key={i}
+                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/8 text-primary border border-primary/20"
+                            >
                               <GraduationCap className="h-3 w-3" />
                               {r}
                             </span>
@@ -204,7 +229,8 @@ export default function HiringCalendar() {
         {!loading && filteredItems.length > 0 && (
           <div className="p-4 bg-muted/20 border-t border-border flex items-center justify-between text-sm">
             <span className="text-muted-foreground">
-              Showing <strong className="text-foreground">{(currentPage - 1) * itemsPerPage + 1}</strong> to{" "}
+              Showing{" "}
+              <strong className="text-foreground">{(currentPage - 1) * itemsPerPage + 1}</strong> to{" "}
               <strong className="text-foreground">
                 {Math.min(currentPage * itemsPerPage, filteredItems.length)}
               </strong>{" "}

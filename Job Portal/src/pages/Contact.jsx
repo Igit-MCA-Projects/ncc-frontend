@@ -21,19 +21,39 @@ export default function Contact() {
             Have feedback, a partnership idea, or just a hello? Drop us a note.
           </p>
           <ul className="mt-8 space-y-4 text-sm">
-            <li className="flex items-center gap-3"><Mail className="h-4 w-4 text-[color:var(--ncc-maroon)]"/> hello@ncccareer.ai</li>
-            <li className="flex items-center gap-3"><Phone className="h-4 w-4 text-[color:var(--ncc-maroon)]"/> +91 98765 43210</li>
-            <li className="flex items-center gap-3"><MapPin className="h-4 w-4 text-[color:var(--ncc-maroon)]"/> New Delhi, India</li>
+            <li className="flex items-center gap-3">
+              <Mail className="h-4 w-4 text-[color:var(--ncc-maroon)]" /> hello@ncccareer.ai
+            </li>
+            <li className="flex items-center gap-3">
+              <Phone className="h-4 w-4 text-[color:var(--ncc-maroon)]" /> +91 98765 43210
+            </li>
+            <li className="flex items-center gap-3">
+              <MapPin className="h-4 w-4 text-[color:var(--ncc-maroon)]" /> New Delhi, India
+            </li>
           </ul>
         </div>
 
         <form onSubmit={submit} className="card-soft p-6 sm:p-8 space-y-4">
-          <Field label="Your name" value={form.name} onChange={(v) => setForm({ ...form, name: v })}/>
-          <Field label="Email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })}/>
+          <Field
+            label="Your name"
+            value={form.name}
+            onChange={(v) => setForm({ ...form, name: v })}
+          />
+          <Field
+            label="Email"
+            type="email"
+            value={form.email}
+            onChange={(v) => setForm({ ...form, email: v })}
+          />
           <label className="block">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Message</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Message
+            </span>
             <textarea
-              required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}
+              required
+              rows={5}
+              value={form.message}
+              onChange={(e) => setForm({ ...form, message: e.target.value })}
               className="mt-1 w-full p-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
           </label>
@@ -47,9 +67,16 @@ export default function Contact() {
 function Field({ label, type = "text", value, onChange }) {
   return (
     <label className="block">
-      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-      <input required type={type} value={value} onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full h-11 px-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"/>
+      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+      <input
+        required
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full h-11 px-3 rounded-xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
+      />
     </label>
   );
 }

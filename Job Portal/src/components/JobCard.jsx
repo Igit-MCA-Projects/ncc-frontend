@@ -23,7 +23,9 @@ export default function JobCard({ job, index = 0 }) {
 
   // ── Derive company name & logo ──────────────────────────────────────────────
   const companyName = job.organization?.name || "TechCorp";
-  const logoUrl = job.jobImage || job.organization?.logo ||
+  const logoUrl =
+    job.jobImage ||
+    job.organization?.logo ||
     `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(companyName)}&backgroundColor=800000`;
 
   // ── Dynamic AI Match Calculation ──────────────────────────────────────────
@@ -34,9 +36,8 @@ export default function JobCard({ job, index = 0 }) {
   const missing = jobSkills.filter((s) => !userSkills.includes(s.toLowerCase()));
 
   // Base match calculation + NCC bonus
-  const baseMatch = jobSkills.length > 0
-    ? Math.round((matched.length / jobSkills.length) * 100)
-    : 80;
+  const baseMatch =
+    jobSkills.length > 0 ? Math.round((matched.length / jobSkills.length) * 100) : 80;
   // If student has NCC profile context or cert
   const hasNcc = !!profile?.nccUnit || !!profile?.enrolmentNumber;
   const matchPercent = Math.min(100, baseMatch + (hasNcc ? 12 : 0));
@@ -47,7 +48,9 @@ export default function JobCard({ job, index = 0 }) {
 
   // ── Salary and details mapping ──────────────────────────────────────────────
   const salaryText = job.ctc || job.stipend || "Not Disclosed";
-  const jobType = job.hirignType ? job.hirignType.charAt(0) + job.hirignType.slice(1).toLowerCase() : "Full-time";
+  const jobType = job.hirignType
+    ? job.hirignType.charAt(0) + job.hirignType.slice(1).toLowerCase()
+    : "Full-time";
   const locationText = job.Location || "Remote";
 
   return (
@@ -87,8 +90,14 @@ export default function JobCard({ job, index = 0 }) {
               </div>
             </div>
           </div>
-          <button onClick={handleToggle} aria-label="Save" className="p-2 rounded-full hover:bg-muted shrink-0 transition-colors">
-            <Bookmark className={`h-4.5 w-4.5 ${saved ? "fill-primary text-primary" : "text-muted-foreground"}`} />
+          <button
+            onClick={handleToggle}
+            aria-label="Save"
+            className="p-2 rounded-full hover:bg-muted shrink-0 transition-colors"
+          >
+            <Bookmark
+              className={`h-4.5 w-4.5 ${saved ? "fill-primary text-primary" : "text-muted-foreground"}`}
+            />
           </button>
         </div>
 
@@ -98,15 +107,15 @@ export default function JobCard({ job, index = 0 }) {
             <Sparkles className="h-3 w-3" />
             {matchPercent}% Match
           </span>
-          <span className="text-[10px] text-muted-foreground">
-            {jobType}
-          </span>
+          <span className="text-[10px] text-muted-foreground">{jobType}</span>
         </div>
 
         {/* Dynamic skills match UI */}
         <div className="mt-3.5 grid grid-cols-2 gap-3 text-[11px] sm:text-xs">
           <div>
-            <div className="font-semibold text-muted-foreground/80 mb-1 pointer-events-none">Matched Skills</div>
+            <div className="font-semibold text-muted-foreground/80 mb-1 pointer-events-none">
+              Matched Skills
+            </div>
             <ul className="space-y-1 text-muted-foreground">
               {displayMatched.slice(0, 3).map((m) => (
                 <li key={m} className="flex items-center gap-1 truncate text-green-600 font-medium">
@@ -117,11 +126,20 @@ export default function JobCard({ job, index = 0 }) {
             </ul>
           </div>
           <div>
-            <div className="font-semibold text-muted-foreground/80 mb-1 pointer-events-none">Missing Skills</div>
+            <div className="font-semibold text-muted-foreground/80 mb-1 pointer-events-none">
+              Missing Skills
+            </div>
             <ul className="space-y-1 text-muted-foreground">
               {displayMissing.slice(0, 3).map((m) => (
-                <li key={m} className={`flex items-center gap-1 truncate ${missing.length > 0 ? "text-destructive font-medium" : "text-muted-foreground"}`}>
-                  {missing.length > 0 ? <X className="h-3 w-3 shrink-0" /> : <Check className="h-3 w-3 shrink-0 text-green-500" />}
+                <li
+                  key={m}
+                  className={`flex items-center gap-1 truncate ${missing.length > 0 ? "text-destructive font-medium" : "text-muted-foreground"}`}
+                >
+                  {missing.length > 0 ? (
+                    <X className="h-3 w-3 shrink-0" />
+                  ) : (
+                    <Check className="h-3 w-3 shrink-0 text-green-500" />
+                  )}
                   {m}
                 </li>
               ))}
@@ -131,7 +149,10 @@ export default function JobCard({ job, index = 0 }) {
       </div>
 
       <div className="mt-5 flex gap-2">
-        <Link to={`/jobs/${job.id}`} className="btn-primary text-xs flex-1 text-center py-2 h-9 flex items-center justify-center font-bold">
+        <Link
+          to={`/jobs/${job.id}`}
+          className="btn-primary text-xs flex-1 text-center py-2 h-9 flex items-center justify-center font-bold"
+        >
           View Details
         </Link>
         {saved ? (
@@ -143,10 +164,7 @@ export default function JobCard({ job, index = 0 }) {
             <Trash2 className="h-4.5 w-4.5" />
           </button>
         ) : (
-          <button
-            onClick={handleToggle}
-            className="btn-outline text-xs px-2.5 h-9 font-bold"
-          >
+          <button onClick={handleToggle} className="btn-outline text-xs px-2.5 h-9 font-bold">
             Save
           </button>
         )}

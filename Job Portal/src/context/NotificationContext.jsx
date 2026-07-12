@@ -15,7 +15,7 @@ export function NotificationProvider({ children }) {
     setError(null);
     try {
       const data = await getPersonalNotifications();
-      const list = Array.isArray(data) ? data : (data?.notifications || []);
+      const list = Array.isArray(data) ? data : data?.notifications || [];
       setPersonalNotifications(list);
       return list;
     } catch (err) {

@@ -3,7 +3,6 @@ import { api } from "./api";
 // Use a relative baseURL so requests go through the Vite dev proxy
 // (avoids CORS entirely in development). In production, update this to the real domain.
 
-
 /** Extract a human-readable error from the API response envelope. */
 function extractError(error) {
   const data = error?.response?.data;
@@ -28,7 +27,7 @@ function assertSuccess(res) {
 export async function registerStudent(payload) {
   try {
     const res = await api.post("/auth/register", payload);
-    console.log(res)
+    console.log(res);
     return assertSuccess(res);
   } catch (err) {
     throw new Error(extractError(err));

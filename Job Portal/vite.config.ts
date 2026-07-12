@@ -8,5 +8,8 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
   },
-  server: { port: 8080 }
+  server: { port: 8080 },
+  optimizeDeps: {
+    include: ["html2pdf.js"],
+  },
 });

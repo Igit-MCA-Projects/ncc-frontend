@@ -40,13 +40,25 @@ export default function Jobs() {
         if (filters.experience === "All") return true;
         const textToSearch = `${j.title} ${j.description}`.toLowerCase();
         if (filters.experience === "Fresher") {
-          return textToSearch.includes("fresher") || textToSearch.includes("0-") || textToSearch.includes("no experience");
+          return (
+            textToSearch.includes("fresher") ||
+            textToSearch.includes("0-") ||
+            textToSearch.includes("no experience")
+          );
         }
         if (filters.experience === "0–2 yrs") {
-          return textToSearch.includes("0-2") || textToSearch.includes("1 year") || textToSearch.includes("fresher");
+          return (
+            textToSearch.includes("0-2") ||
+            textToSearch.includes("1 year") ||
+            textToSearch.includes("fresher")
+          );
         }
         if (filters.experience === "2–4 yrs") {
-          return textToSearch.includes("2-4") || textToSearch.includes("3 years") || textToSearch.includes("4 years");
+          return (
+            textToSearch.includes("2-4") ||
+            textToSearch.includes("3 years") ||
+            textToSearch.includes("4 years")
+          );
         }
         if (filters.experience === "Internship") {
           return j.hirignType === "INTERNSHIP" || textToSearch.includes("intern");

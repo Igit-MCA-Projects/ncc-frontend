@@ -1,5 +1,10 @@
 import { createContext, useContext, useState, useCallback } from "react";
-import { getAllMentors, requestMentorship, getMentorshipStatus, deleteMentorshipRequest } from "../services/mentorshipApi";
+import {
+  getAllMentors,
+  requestMentorship,
+  getMentorshipStatus,
+  deleteMentorshipRequest,
+} from "../services/mentorshipApi";
 import toast from "react-hot-toast";
 
 const MentorshipContext = createContext(null);
@@ -40,25 +45,28 @@ export function MentorshipProvider({ children }) {
     }
   }, []);
 
-  const sendMentorshipRequest = useCallback(async ({ teacherId, note }) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await requestMentorship({ teacherId, note });
-      toast.success("Mentorship request sent successfully!");
-      // Optionally refetch mentors to reflect new connection status
-      await fetchMentors();
-      // Optionally refetch mentorship requests as well
-      await fetchMentorshipRequests();
-      return res;
-    } catch (err) {
-      setError(err.message || "Failed to send mentorship request");
-      toast.error(err.message || "Failed to send mentorship request");
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchMentors, fetchMentorshipRequests]);
+  const sendMentorshipRequest = useCallback(
+    async ({ teacherId, note }) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await requestMentorship({ teacherId, note });
+        toast.success("Mentorship request sent successfully!");
+        // Optionally refetch mentors to reflect new connection status
+        await fetchMentors();
+        // Optionally refetch mentorship requests as well
+        await fetchMentorshipRequests();
+        return res;
+      } catch (err) {
+        setError(err.message || "Failed to send mentorship request");
+        toast.error(err.message || "Failed to send mentorship request");
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchMentors, fetchMentorshipRequests],
+  );
 
   const deleteMentorship = useCallback(async (mentorshipId) => {
     setLoading(true);

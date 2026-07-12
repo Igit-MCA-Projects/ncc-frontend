@@ -27,17 +27,20 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           Something went wrong
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          You can try again or head back home.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">You can try again or head back home.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="btn-primary"
           >
             Try again
           </button>
-          <a href="/" className="btn-outline">Go home</a>
+          <a href="/" className="btn-outline">
+            Go home
+          </a>
         </div>
       </div>
     </div>
@@ -50,7 +53,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "NCC Career AI — AI-powered careers for cadets" },
-      { name: "description", content: "Discover jobs matched to your skills, education and NCC achievements with AI built for cadets." },
+      {
+        name: "description",
+        content:
+          "Discover jobs matched to your skills, education and NCC achievements with AI built for cadets.",
+      },
       { property: "og:title", content: "NCC Career AI" },
       { property: "og:description", content: "AI-powered career platform built for NCC cadets." },
       { property: "og:type", content: "website" },
@@ -60,7 +67,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,

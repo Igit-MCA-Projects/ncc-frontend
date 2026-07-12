@@ -52,54 +52,57 @@ export function JobsProvider({ children }) {
     }
   }, []);
 
-  const toggleSaveJob = useCallback(async (jobId) => {
-    const savedJobId = savedJobsMap[jobId];
-    if (savedJobId) {
-      // Unsave the job
-      try {
-        await deleteSavedJob(savedJobId, jobId);
-        // update local list
-        setSavedJobs((prev) => prev.filter((item) => item.id !== savedJobId));
-        // update map
-        setSavedJobsMap((prev) => {
-          const next = { ...prev };
-          delete next[jobId];
-          return next;
-        });
-        toast.success("Job removed from saved");
-        return false; // isSaved = false
-      } catch (err) {
-        toast.error(err.message || "Failed to remove job");
-        throw err;
+  const toggleSaveJob = useCallback(
+    async (jobId) => {
+      const savedJobId = savedJobsMap[jobId];
+      if (savedJobId) {
+        // Unsave the job
+        try {
+          await deleteSavedJob(savedJobId, jobId);
+          // update local list
+          setSavedJobs((prev) => prev.filter((item) => item.id !== savedJobId));
+          // update map
+          setSavedJobsMap((prev) => {
+            const next = { ...prev };
+            delete next[jobId];
+            return next;
+          });
+          toast.success("Job removed from saved");
+          return false; // isSaved = false
+        } catch (err) {
+          toast.error(err.message || "Failed to remove job");
+          throw err;
+        }
+      } else {
+        // Save the job
+        try {
+          const newSavedJob = await saveJob(jobId);
+          // update map & lists
+          setSavedJobsMap((prev) => ({
+            ...prev,
+            [jobId]: newSavedJob.id,
+          }));
+          // find job in jobs list to add to savedJobs list, or add dummy
+          const jobDetails = jobs.find((j) => j.id === jobId) || null;
+          setSavedJobs((prev) => [
+            ...prev,
+            {
+              id: newSavedJob.id,
+              studentId: newSavedJob.studentId,
+              jobId: jobId,
+              job: jobDetails,
+            },
+          ]);
+          toast.success("Job saved successfully!");
+          return true; // isSaved = true
+        } catch (err) {
+          toast.error(err.message || "Failed to save job");
+          throw err;
+        }
       }
-    } else {
-      // Save the job
-      try {
-        const newSavedJob = await saveJob(jobId);
-        // update map & lists
-        setSavedJobsMap((prev) => ({
-          ...prev,
-          [jobId]: newSavedJob.id,
-        }));
-        // find job in jobs list to add to savedJobs list, or add dummy
-        const jobDetails = jobs.find((j) => j.id === jobId) || null;
-        setSavedJobs((prev) => [
-          ...prev,
-          {
-            id: newSavedJob.id,
-            studentId: newSavedJob.studentId,
-            jobId: jobId,
-            job: jobDetails,
-          },
-        ]);
-        toast.success("Job saved successfully!");
-        return true; // isSaved = true
-      } catch (err) {
-        toast.error(err.message || "Failed to save job");
-        throw err;
-      }
-    }
-  }, [savedJobsMap, jobs]);
+    },
+    [savedJobsMap, jobs],
+  );
 
   return (
     <JobsContext.Provider

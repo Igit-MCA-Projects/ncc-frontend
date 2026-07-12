@@ -5,10 +5,14 @@ export default function ProfileCompletionCard({ percent = 70, onEdit }) {
     <div className="card-soft p-5">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Profile completion</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">
+            Profile completion
+          </p>
           <h3 className="text-2xl font-display font-extrabold">{percent}%</h3>
         </div>
-        <button onClick={onEdit} className="btn-outline text-sm">Complete</button>
+        <button onClick={onEdit} className="btn-outline text-sm">
+          Complete
+        </button>
       </div>
       <div className="mt-4 h-2 rounded-full bg-muted overflow-hidden">
         <motion.div

@@ -11,7 +11,9 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const saved = localStorage.getItem("ncc.user");
     if (saved) {
-      try { setUser(JSON.parse(saved)); } catch {}
+      try {
+        setUser(JSON.parse(saved));
+      } catch {}
     }
     setReady(true);
   }, []);
@@ -20,12 +22,10 @@ export function AuthProvider({ children }) {
     return await authApi.registerStudent({ fullName, email, password });
   };
 
-  
   const verifyEmail = async ({ email, otp }) => {
     return await authApi.verifyEmail({ email, otp });
   };
 
-  
   const login = async ({ email, password }) => {
     const data = await authApi.loginStudent({ email, password });
     // Backend uses httpOnly cookie — response data may be null.

@@ -1,5 +1,18 @@
 import { useEffect, useState, useMemo } from "react";
-import { Users, Clock, CheckCircle2, XCircle, AlertCircle, RefreshCw, Phone, Mail, Calendar, MessageSquare, ArrowRight, Trash2 } from "lucide-react";
+import {
+  Users,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  RefreshCw,
+  Phone,
+  Mail,
+  Calendar,
+  MessageSquare,
+  ArrowRight,
+  Trash2,
+} from "lucide-react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { useMentorshipContext } from "../context/MentorshipContext";
 import toast from "react-hot-toast";
@@ -7,17 +20,20 @@ import toast from "react-hot-toast";
 const STATUS_METADATA = {
   ACCEPTED: {
     label: "Accepted",
-    color: "text-green-600 border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-900/60 dark:text-green-400",
+    color:
+      "text-green-600 border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-900/60 dark:text-green-400",
     icon: CheckCircle2,
   },
   PENDING: {
     label: "Pending",
-    color: "text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900/60 dark:text-amber-400",
+    color:
+      "text-amber-600 border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900/60 dark:text-amber-400",
     icon: Clock,
   },
   REJECTED: {
     label: "Rejected",
-    color: "text-rose-600 border-rose-200 bg-rose-50 dark:bg-rose-950/20 dark:border-rose-900/60 dark:text-rose-400",
+    color:
+      "text-rose-600 border-rose-200 bg-rose-50 dark:bg-rose-950/20 dark:border-rose-900/60 dark:text-rose-400",
     icon: XCircle,
   },
 };
@@ -26,21 +42,26 @@ function formatDate(isoString) {
   if (!isoString) return "-";
   try {
     const d = new Date(isoString);
-    return d.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }) + " at " + d.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    return (
+      d.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }) +
+      " at " +
+      d.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
   } catch (err) {
     return isoString;
   }
 }
 
 export default function MentorshipStatus() {
-  const { mentorshipRequests, loading, fetchMentorshipRequests, deleteMentorship } = useMentorshipContext();
+  const { mentorshipRequests, loading, fetchMentorshipRequests, deleteMentorship } =
+    useMentorshipContext();
   const [filter, setFilter] = useState("ALL");
 
   useEffect(() => {
@@ -78,12 +99,12 @@ export default function MentorshipStatus() {
         </div>
         <button
           onClick={async () => {
-             try {
-               await fetchMentorshipRequests();
-               toast.success("Mentorship status refreshed!");
-             } catch (err) {
-               toast.error(err?.message || "Refresh failed");
-             }
+            try {
+              await fetchMentorshipRequests();
+              toast.success("Mentorship status refreshed!");
+            } catch (err) {
+              toast.error(err?.message || "Refresh failed");
+            }
           }}
           disabled={loading}
           className="flex items-center gap-1.5 text-xs font-semibold btn-outline max-w-max px-3.5 py-2"
@@ -105,9 +126,11 @@ export default function MentorshipStatus() {
               }`}
             >
               {tab === "ALL" ? "All Requests" : tab}
-              <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-              }`}>
+              <span
+                className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                  isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                }`}
+              >
                 {counts[tab]}
               </span>
               {isActive && (
@@ -132,7 +155,7 @@ export default function MentorshipStatus() {
             </div>
             <h3 className="font-bold text-base text-foreground">No Requests Found</h3>
             <p className="text-xs text-muted-foreground max-w-sm">
-              {filter === "ALL" 
+              {filter === "ALL"
                 ? "You haven't requested mentorship from any advisor yet. Connect with verified mentors on the dashboard."
                 : `You don't have any mentorship connection requests currently with status "${filter}".`}
             </p>
@@ -162,16 +185,24 @@ export default function MentorshipStatus() {
                       className="h-12 w-12 rounded-2xl bg-muted outline outline-1 outline-border object-cover"
                     />
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-base text-foreground leading-snug">{mentorName}</h4>
+                      <h4 className="font-bold text-base text-foreground leading-snug">
+                        {mentorName}
+                      </h4>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 mt-1 text-xs text-muted-foreground">
                         {req.mentor?.email && (
-                          <a href={`mailto:${req.mentor.email}`} className="flex items-center gap-1 hover:text-primary transition-colors">
+                          <a
+                            href={`mailto:${req.mentor.email}`}
+                            className="flex items-center gap-1 hover:text-primary transition-colors"
+                          >
                             <Mail className="h-3.5 w-3.5 shrink-0" />
                             {req.mentor.email}
                           </a>
                         )}
                         {req.mentor?.phone && (
-                          <a href={`tel:${req.mentor.phone}`} className="flex items-center gap-1 hover:text-primary transition-colors">
+                          <a
+                            href={`tel:${req.mentor.phone}`}
+                            className="flex items-center gap-1 hover:text-primary transition-colors"
+                          >
                             <Phone className="h-3.5 w-3.5 shrink-0" />
                             {req.mentor.phone}
                           </a>
@@ -206,21 +237,23 @@ export default function MentorshipStatus() {
                 {/* Right Side: Status Badge & Timestamps */}
                 <div className="flex flex-row md:flex-col justify-between md:justify-start md:items-end gap-3 shrink-0 border-t md:border-t-0 md:border-l border-border/60 pt-3.5 md:pt-0 md:pl-5">
                   <div className="flex flex-col gap-2 md:items-end">
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Connection Status</span>
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                      Connection Status
+                    </span>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${meta.color}`}>
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${meta.color}`}
+                      >
                         <StatusIcon className="h-3.5 w-3.5" />
                         {meta.label}
                       </span>
                       <button
                         onClick={async () => {
-                         
-                            try {
-                              await deleteMentorship(req.id);
-                            } catch (err) {
-                              // Already handled
-                            }
-                          
+                          try {
+                            await deleteMentorship(req.id);
+                          } catch (err) {
+                            // Already handled
+                          }
                         }}
                         className="p-1.5 rounded-xl text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 hover:text-rose-700 transition-colors shrink-0"
                         title="Delete Mentorship Request"
