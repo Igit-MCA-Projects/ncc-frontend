@@ -51,6 +51,19 @@ export async function updateStudentProfile(payload) {
   return res.data;
 }
 
+// ─── Student AI Context ──────────────────────────────────────────────────────
+
+/**
+ * GET /student/context
+ * Returns a rich snapshot of the student's profile, skills, education,
+ * marks, address, preferences and NCC details — used as Gemini system-prompt context.
+ */
+export async function getStudentContext() {
+  const res = await api.get("/student/context");
+  if (!res.data?.success) throw new Error(res.data?.message || "Failed to load student context");
+  return res.data.data; // { profile, skills, education, marks, address, preferences, ncc }
+}
+
 // ─── Saved Jobs ──────────────────────────────────────────────────────────────
 
 export async function getSavedJobs() {
