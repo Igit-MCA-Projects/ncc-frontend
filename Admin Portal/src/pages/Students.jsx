@@ -24,7 +24,10 @@ function StudentsPage() {
 
   const load = () => {
     setLoading(true);
-    getStudents().then((r) => setStudents(r.data)).finally(() => setLoading(false));
+    getStudents(1, 100)
+      .then((r) => setStudents(r?.data || []))
+      .catch(() => toast.error("Failed to load students"))
+      .finally(() => setLoading(false));
   };
   useEffect(load, []);
 

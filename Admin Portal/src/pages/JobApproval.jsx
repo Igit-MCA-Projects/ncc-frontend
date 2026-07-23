@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Check, X, Eye, MapPin, Briefcase, Calendar, Wallet } from "lucide-react";
+import { Check, X, Eye, MapPin, Briefcase, Calendar, Wallet, Pencil } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import EmptyState from "@/components/EmptyState";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
-import { getJobs, approveJob, rejectJob } from "@/services/adminService";
+import { getJobs, approveJob, rejectJob, updateJob } from "@/services/adminService";
 import { cls } from "@/utils/format";
 
 
@@ -19,6 +19,26 @@ function JobApprovalPage() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("pending");
   const [preview, setPreview] = useState(null);
+  const [editingJob, setEditingJob] = useState(null);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    description: "",
+    skillText: "",
+    Location: "",
+    hirignType: "",
+    ctc: "",
+    stipend: "",
+    applyLink: "",
+    startDate: "",
+    endData: "",
+    organization: {
+      name: "",
+      email: "",
+      phone: "",
+      website: "",
+      description: "",
+    },
+  });
 
   const load = () => {
     setLoading(true);
@@ -37,6 +57,88 @@ function JobApprovalPage() {
     await rejectJob(id);
     toast.success("Job rejected");
     load();
+  };
+
+  const openEdit = (job) => {
+    setEditingJob(job);
+    setEditForm({
+      title: job?.title || "",
+      description: job?.description || "",
+      skillText: Array.isArray(job?.skills) ? job.skills.join(", ") : job?.skills || "",
+      Location: job?.Location || job?.location || "",
+      hirignType: job?.hirignType || "",
+      ctc: job?.ctc || "",
+      stipend: job?.stipend || "",
+      applyLink: job?.applyLink || "",
+      startDate: job?.startDate ? new Date(job.startDate).toISOString().slice(0, 16) : "",
+      endData: job?.endData ? new Date(job.endData).toISOString().slice(0, 16) : "",
+      organization: {
+        name: job?.organization?.name || "",
+        email: job?.organization?.email || "",
+        phone: job?.organization?.phone || "",
+        website: job?.organization?.website || "",
+        description: job?.organization?.description || "",
+      },
+    });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    if (name.startsWith("organization.")) {
+      const key = name.split(".")[1];
+      setEditForm((prev) => ({
+        ...prev,
+        organization: {
+          ...prev.organization,
+          [key]: value,
+        },
+      }));
+      return;
+    }
+
+    setEditForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    if (!editingJob?.id) return;
+
+    try {
+      const payload = {
+        jobId: editingJob.id,
+        title: editForm.title || undefined,
+        description: editForm.description || undefined,
+        skills: editForm.skillText
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean),
+        Location: editForm.Location || undefined,
+        hirignType: editForm.hirignType || undefined,
+        ctc: editForm.ctc || undefined,
+        stipend: editForm.stipend || undefined,
+        applyLink: editForm.applyLink || undefined,
+        startDate: editForm.startDate || undefined,
+        endData: editForm.endData || undefined,
+        organization: {
+          name: editForm.organization.name || undefined,
+          email: editForm.organization.email || undefined,
+          phone: editForm.organization.phone || undefined,
+          website: editForm.organization.website || undefined,
+          description: editForm.organization.description || undefined,
+        },
+      };
+
+      const response = await updateJob(payload);
+      if (response?.success) {
+        toast.success("Job updated successfully");
+        setEditingJob(null);
+        load();
+      } else {
+        toast.error(response?.message || "Failed to update job");
+      }
+    } catch (error) {
+      toast.error(error?.message || "Failed to update job");
+    }
   };
 
   return (
@@ -93,6 +195,12 @@ function JobApprovalPage() {
                 >
                   <Eye size={14} /> View
                 </button>
+                <button
+                  onClick={() => openEdit(j)}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-input px-3 py-1.5 text-sm hover:bg-muted"
+                >
+                  <Pencil size={14} /> Edit
+                </button>
                 {j.status !== "approved" && (
                   <button
                     onClick={() => handleApprove(j.id)}
@@ -132,6 +240,92 @@ function JobApprovalPage() {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {editingJob && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={() => setEditingJob(null)}>
+          <div className="card-surface w-full max-w-2xl p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Edit Job</h3>
+              <button onClick={() => setEditingJob(null)} className="rounded-xl border border-input bg-card px-3 py-1.5 text-sm hover:bg-muted">
+                Close
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdate} className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <label className="text-sm font-medium">Title</label>
+                <input name="title" value={editForm.title} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-sm font-medium">Description</label>
+                <textarea name="description" rows={4} value={editForm.description} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Location</label>
+                <input name="Location" value={editForm.Location} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Hiring Type</label>
+                <select name="hirignType" value={editForm.hirignType} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2">
+                  <option value="">Select</option>
+                  <option value="FULLTIME">Full Time</option>
+                  <option value="PARTTME">Part Time</option>
+                  <option value="INTERNSHIP">Internship</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium">CTC</label>
+                <input name="ctc" value={editForm.ctc} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Stipend</label>
+                <input name="stipend" value={editForm.stipend} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Apply Link</label>
+                <input name="applyLink" value={editForm.applyLink} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Start Date</label>
+                <input type="datetime-local" name="startDate" value={editForm.startDate} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">End Date</label>
+                <input type="datetime-local" name="endData" value={editForm.endData} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-sm font-medium">Skills (comma separated)</label>
+                <input name="skillText" value={editForm.skillText} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-sm font-medium">Organization Name</label>
+                <input name="organization.name" value={editForm.organization.name} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Organization Email</label>
+                <input name="organization.email" value={editForm.organization.email} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Organization Phone</label>
+                <input name="organization.phone" value={editForm.organization.phone} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Organization Website</label>
+                <input name="organization.website" value={editForm.organization.website} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-sm font-medium">Organization Description</label>
+                <textarea name="organization.description" rows={3} value={editForm.organization.description} onChange={handleEditChange} className="mt-1 w-full rounded-xl border px-3 py-2" />
+              </div>
+              <div className="md:col-span-2 flex justify-end">
+                <button type="submit" className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

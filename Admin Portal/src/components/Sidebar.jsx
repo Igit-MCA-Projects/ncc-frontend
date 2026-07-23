@@ -2,11 +2,14 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
-  Building2,
   ClipboardCheck,
-  ShieldCheck,
   User,
-  Settings,
+  SquarePlus,
+  UserCheck,
+  Award,
+  GraduationCap,
+  Bell,
+  CalendarDays,
   LogOut,
   X,
 } from "lucide-react";
@@ -17,11 +20,14 @@ import { cls } from "@/utils/format";
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/students", label: "Students", icon: Users },
-  { to: "/companies", label: "Companies", icon: Building2 },
-  { to: "/job-approval", label: "Job Approval", icon: ClipboardCheck },
-  { to: "/sub-admins", label: "Sub Admins", icon: ShieldCheck },
+  { to: "/mentorship", label: "Mentorship", icon: UserCheck },
+  { to: "/job-approval", label: "Jobs", icon: ClipboardCheck },
+  { to: "/notifications", label: "Notifications", icon: Bell },
+  { to: "/ncc-benefits", label: "NCC Benefits", icon: Award },
+  { to: "/scholarships", label: "Scholarships", icon: GraduationCap },
   { to: "/profile", label: "Profile", icon: User },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/addJob", label: "Post Jobs", icon: SquarePlus },
+  { to: "/hiring-calendar", label: "Hiring Calendar", icon: CalendarDays },
 ];
 
 export default function Sidebar() {

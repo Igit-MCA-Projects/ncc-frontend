@@ -1,5 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { loginAdmin } from "@/services/adminService";
+import {
+  loginAdmin,
+  logoutAdmin,
+  getAdminProfile,
+} from "@/services/adminService";
 
 const AuthContext = createContext(null);
 
@@ -8,33 +12,49 @@ export function AuthProvider({ children }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const token = localStorage.getItem("ncc_admin_token");
-    const stored = localStorage.getItem("ncc_admin_user");
-    if (token && stored) {
+    const initializeAuth = async () => {
       try {
-        setUser(JSON.parse(stored));
-      } catch {}
-    }
-    setReady(true);
+        const response = await getAdminProfile();
+
+        if (response.success) {
+          setUser(response.data);
+        } else {
+          setUser(null);
+        }
+      } catch {
+        setUser(null);
+      } finally {
+        setReady(true);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (creds) => {
-    const { data } = await loginAdmin(creds);
-    localStorage.setItem("ncc_admin_token", data.token);
-    localStorage.setItem("ncc_admin_user", JSON.stringify(data.user));
-    setUser(data.user);
-    return data.user;
+    await loginAdmin(creds);
+
+    const profile = await getAdminProfile();
+
+    if (profile.success) {
+      setUser(profile.data);
+      return profile.data;
+    }
+
+    setUser(null);
+    return null;
   };
 
-  const logout = () => {
-    localStorage.removeItem("ncc_admin_token");
-    localStorage.removeItem("ncc_admin_user");
-    setUser(null);
+  const logout = async () => {
+    try {
+      await logoutAdmin();
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, ready }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout, setReady, ready }}>
       {children}
     </AuthContext.Provider>
   );

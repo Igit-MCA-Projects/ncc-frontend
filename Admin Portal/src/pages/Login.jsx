@@ -3,29 +3,38 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { loginAdmin } from "@/services/adminService";
 
 
 function LoginPage() {
-  const { login, user, ready } = useAuth();
+  const { login, ready, user } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("admin@ncc.ai");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
 
   useEffect(() => {
-    if (ready && user) navigate("/dashboard", { replace: true });
+    if (ready && user) {
+      navigate("/dashboard", { replace: true });
+    }
   }, [ready, user, navigate]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      await login({ email, password });
-      toast.success("Welcome back!");
-      navigate("/dashboard", { replace: true });
+      const user = await login({ email, password });
+
+      if (user) {
+        toast.success("Welcome back!");
+        navigate("/dashboard", { replace: true });
+      } else {
+        toast.error("Login failed");
+      }
     } catch (err) {
       toast.error(err?.message || "Login failed");
     } finally {
@@ -82,6 +91,7 @@ function LoginPage() {
                 <input
                   type="email"
                   required
+                  placeholder="admin@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-xl border border-input bg-card pl-9 pr-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -95,6 +105,7 @@ function LoginPage() {
                 <input
                   type={showPw ? "text" : "password"}
                   required
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full rounded-xl border border-input bg-card pl-9 pr-10 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -134,6 +145,18 @@ function LoginPage() {
               {loading && <Loader2 size={16} className="animate-spin" />}
               Sign in
             </button>
+            <p>
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/register");
+                }}
+                className="text-sm text-primary hover:underline"
+              >
+                Register here
+              </button>
+            </p>
           </form>
         </div>
       </div>

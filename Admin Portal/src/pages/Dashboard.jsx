@@ -2,46 +2,59 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   Users,
-  Building2,
   Clock,
   CheckCircle2,
-  XCircle,
-  ShieldCheck,
+  UserCheck,
+  Award,
+  GraduationCap,
+  Briefcase,
 } from "lucide-react";
 import StatCard from "@/components/StatCard";
 import StatusBadge from "@/components/StatusBadge";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import {
   getStudents,
-  getCompanies,
   getJobs,
-  getSubAdmins,
+  getMentorshipRequests,
+  getNccBenefits,
+  getScholarships,
 } from "@/services/adminService";
-
 
 function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     students: [],
-    companies: [],
     jobs: [],
-    subAdmins: [],
+    mentorship: [],
+    nccBenefits: [],
+    scholarships: [],
   });
 
   useEffect(() => {
-    Promise.all([getStudents(), getCompanies(), getJobs(), getSubAdmins()])
-      .then(([s, c, j, sa]) => {
-        setData({ students: s.data, companies: c.data, jobs: j.data, subAdmins: sa.data });
+    Promise.all([
+      getStudents(),
+      getJobs(),
+      getMentorshipRequests(),
+      getNccBenefits(),
+      getScholarships(),
+    ])
+      .then(([s, j, m, b, sc]) => {
+        setData({
+          students: s.data || [],
+          jobs: j.data || [],
+          mentorship: m.data || [],
+          nccBenefits: b.data || [],
+          scholarships: sc.data || [],
+        });
       })
       .finally(() => setLoading(false));
   }, []);
 
-  const pending = data.jobs.filter((j) => j.status === "pending").length;
-  const approved = data.jobs.filter((j) => j.status === "approved").length;
-  const rejected = data.jobs.filter((j) => j.status === "rejected").length;
-  const activeSubs = data.subAdmins.filter((s) => s.status === "active").length;
+  const pendingJobs = data.jobs.filter((j) => j.status === "pending").length;
+  const approvedJobs = data.jobs.filter((j) => j.status === "approved").length;
+  const pendingMentorship = data.mentorship.filter((m) => m.status === "PENDING").length;
   const recentStudents = data.students.slice(0, 5);
-  const recentCompanies = data.companies.slice(0, 5);
+  const recentJobs = data.jobs.slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -56,11 +69,11 @@ function DashboardPage() {
         <>
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             <StatCard icon={Users} label="Total Students" value={data.students.length} tone="primary" />
-            <StatCard icon={Building2} label="Total Companies" value={data.companies.length} tone="secondary" />
-            <StatCard icon={Clock} label="Pending Jobs" value={pending} tone="warning" />
-            <StatCard icon={CheckCircle2} label="Approved Jobs" value={approved} tone="success" />
-            <StatCard icon={XCircle} label="Rejected Jobs" value={rejected} tone="destructive" />
-            <StatCard icon={ShieldCheck} label="Active Sub Admins" value={activeSubs} tone="accent" />
+            <StatCard icon={UserCheck} label="Pending Mentorships" value={pendingMentorship} tone="accent" />
+            <StatCard icon={Clock} label="Pending Jobs" value={pendingJobs} tone="warning" />
+            <StatCard icon={CheckCircle2} label="Approved Jobs" value={approvedJobs} tone="success" />
+            <StatCard icon={Award} label="NCC Benefits" value={data.nccBenefits.length} tone="secondary" />
+            <StatCard icon={GraduationCap} label="Scholarships" value={data.scholarships.length} tone="primary" />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
@@ -85,22 +98,28 @@ function DashboardPage() {
 
             <div className="card-surface p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold">Recent Companies</h2>
-                <Link to="/companies" className="text-sm text-primary hover:underline">View all</Link>
+                <h2 className="font-semibold">Recent Jobs</h2>
+                <Link to="/job-approval" className="text-sm text-primary hover:underline">View all</Link>
               </div>
               <div className="space-y-3">
-                {recentCompanies.map((c) => (
-                  <div key={c.id} className="flex items-center gap-3">
-                    <img src={c.logo} alt={c.name} className="h-9 w-9 rounded-xl object-cover bg-muted" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{c.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {c.industry} • {c.location}
-                      </p>
+                {recentJobs.length === 0 ? (
+                  <p className="text-xs text-muted-foreground py-4 text-center">No job postings found</p>
+                ) : (
+                  recentJobs.map((j) => (
+                    <div key={j.id} className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-xl bg-primary/10 text-primary grid place-items-center shrink-0">
+                        <Briefcase size={18} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{j.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {j.companyName} • {j.location || "Remote"}
+                        </p>
+                      </div>
+                      <StatusBadge status={j.status} />
                     </div>
-                    <StatusBadge status={c.status} />
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>
